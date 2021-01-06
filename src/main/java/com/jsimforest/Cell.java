@@ -51,7 +51,7 @@ public class Cell {
 
     /**
      *
-     * @param coordX coordinate of cell on the axe X
+     * @param coordX coordinate of cell on the X axis
      * @throws IllegalArgumentException if the coordinate X is inferior or equal to 0
      */
     public void setCoordX(int coordX) {
@@ -69,7 +69,7 @@ public class Cell {
 
     /**
      *
-     * @param coordY  coordinate of cell on the axe Y
+     * @param coordY  coordinate of cell on the Y axis
      */
     public void setCoordY(int coordY) {
         if(coordY >= 0) {
