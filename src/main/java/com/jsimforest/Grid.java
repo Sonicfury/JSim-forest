@@ -1,6 +1,5 @@
 package com.jsimforest;
 
-import javafx.geometry.*;
 import java.util.ArrayList;
 
 public class Grid {
@@ -8,7 +7,6 @@ public class Grid {
         setWidth(width);
         setHeight(height);
         ArrayList<ArrayList<Cell>> matrix = new ArrayList<ArrayList<Cell>>();
-        setJFXRoot(width, height);
         for(int i=0;i<height;i++){
             matrix.add(new ArrayList<Cell>());
             ArrayList<Cell> line = matrix.get(i);
@@ -22,9 +20,8 @@ public class Grid {
     private int width;
     private int height;
     private ArrayList<ArrayList<Cell>> matrix;
-    private javafx.geometry.BoundingBox JFXRoot;
 
-    
+
     public ArrayList<ArrayList<Cell>> getMatrix() {
         return matrix;
     }
@@ -37,27 +34,33 @@ public class Grid {
         return width;
     }
 
+    /**
+     *
+     * @param width number of columns of the simulation
+     * @throws IllegalArgumentException when width value is negative
+     */
     public void setWidth(int width) {
-        this.width = width;
+        if(width > 0){
+            this.width = width;
+        }else{
+            throw new IllegalArgumentException();
+        }
     }
 
     public int getHeight() {
         return height;
     }
 
+    /**
+     *
+     * @param height number of lines of the simulation
+     * @throws IllegalArgumentException when height value is negative
+     */
     public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public BoundingBox getJFXRoot() {
-        return JFXRoot;
-    }
-
-    public void setJFXRoot(BoundingBox JFXRoot) {
-        this.JFXRoot = JFXRoot;
-    }
-
-    public void setJFXRoot(int width, int height) {
-        this.JFXRoot = new BoundingBox(0, 0, width, height);
+        if(height > 0){
+            this.height = height;
+        }else{
+            throw new IllegalArgumentException();
+        }
     }
 }
