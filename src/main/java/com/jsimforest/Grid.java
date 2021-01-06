@@ -26,8 +26,22 @@ public class Grid {
         return matrix;
     }
 
+    /**
+     *
+     * @param matrix new matrix for the grid
+     * @throws IllegalArgumentException when the new matrix have wrong dimensions
+     */
     public void setMatrix(ArrayList<ArrayList<Cell>> matrix) {
-        this.matrix = matrix;
+        if(matrix.size() == this.getHeight()){
+            for(ArrayList<Cell> line: matrix){
+                if(line.size() != this.getWidth()){
+                    throw new IllegalArgumentException();
+                }
+            }
+            this.matrix = matrix;
+        }else{
+            throw new IllegalArgumentException();
+        }
     }
 
     public int getWidth() {
