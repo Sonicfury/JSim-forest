@@ -9,6 +9,10 @@ public class CellType {
         return name;
     }
 
+    /**
+     *
+     * @param name name type of cell
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -17,6 +21,10 @@ public class CellType {
         return color;
     }
 
+    /**
+     *
+     * @param color color of type
+     */
     public void setColor(String color) {
         this.color = color;
     }

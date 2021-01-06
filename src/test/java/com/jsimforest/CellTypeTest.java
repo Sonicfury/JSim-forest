@@ -10,8 +10,8 @@ class CellTypeTest extends AbstractTest {
     public void setCellType(){
        CellType cellType = new CellType();
 
-        String name = "type1";
-        String color = "vert";
+        String name = "tree";
+        String color = "green";
 
         cellType.setName(name);
         cellType.setColor(color);
