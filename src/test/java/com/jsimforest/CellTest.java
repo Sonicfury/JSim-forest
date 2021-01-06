@@ -29,8 +29,6 @@ class CellTest extends AbstractTest {
         assertEquals(coordX, cell.getCoordX());
         assertEquals(coordY, cell.getCoordY());
         assertEquals(health, cell.getHealth());
-
-
     }
 
     @ParameterizedTest(name = "setting coordinates with coordX = {0} and  coordY = {1} " +
