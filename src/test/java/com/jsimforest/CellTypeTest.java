@@ -20,5 +20,4 @@ class CellTypeTest extends AbstractTest {
         assertEquals(color, cellType.getColor());
     }
 
-
 }

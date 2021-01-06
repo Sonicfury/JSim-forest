@@ -5,6 +5,25 @@ public class CellType {
     private String name;
     private String color;
 
+    /**
+     * Configuration CellType - default
+     */
+    public CellType(){
+        this.name = "tree";
+        this.color = "green";
+    }
+
+    /**
+     * Overloading CellType Constructor - full
+     * @param name name of Cell Type
+     * @param color color of Cell
+     */
+
+    public CellType(String name, String color){
+        this.name = name;
+        this.color = color;
+    }
+
     public String getName() {
         return name;
     }
