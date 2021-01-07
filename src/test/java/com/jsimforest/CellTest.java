@@ -1,5 +1,6 @@
 package com.jsimforest;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -7,6 +8,25 @@ import org.junit.jupiter.params.provider.EnumSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CellTest extends AbstractTest {
+
+    @Test
+    public void setCellWithConstructor(){
+        CellType cellType = new CellType();
+        cellType.setColor("green");
+        cellType.setName("void");
+
+        int coordX = 1;
+        int coordY = 1;
+
+        Health health = Health.ok;
+
+        Cell cell = new Cell(cellType, coordX, coordY, health);
+
+        assertEquals(cellType, cell.getCellType());
+        assertEquals(coordX, cell.getCoordX());
+        assertEquals(coordY, cell.getCoordY());
+        assertEquals(health, cell.getHealth());
+    }
 
     @ParameterizedTest
     @EnumSource(Health.class)
