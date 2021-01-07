@@ -1,9 +1,12 @@
 package com.jsimforest;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class GridTest extends AbstractTest {
@@ -20,8 +23,8 @@ public class GridTest extends AbstractTest {
         assertThrows(IllegalArgumentException.class, () -> new Grid(gridWidth, gridHeight));
     }
 
-    @ParameterizedTest(name = "Setting a matrix with uncorrect width {0} or height {1}")
-    @CsvSource({"2, 2, 4, 4", "6, 6, 4, 4"})
+    @ParameterizedTest(name = "Setting a matrix with uncorrect width {0} and height {1}")
+    @CsvSource({"2, 2, 4, 4", "6, 6, 4, 4", "2, 2, 2, 4"})
     public void WrongMatrixDimension_ShouldThrow_IllegalArgumentException(int matrixLines, int matrixColumns, int gridHeight, int gridWidth){
         Grid testGrid = new Grid(gridWidth, gridHeight);
         ArrayList<ArrayList<Cell>> newMatrix = new ArrayList<>();
@@ -32,5 +35,15 @@ public class GridTest extends AbstractTest {
             }
         }
         assertThrows(IllegalArgumentException.class, () -> testGrid.setMatrix(newMatrix));
+    }
+
+    @Test
+    public void SetMatrix(){
+        Grid gridTest = new Grid(2, 2);
+        ArrayList<ArrayList<Cell>> newMatrix = new ArrayList<ArrayList<Cell>>();
+        newMatrix.add(new ArrayList<Cell>(Arrays.asList(new Cell(), new Cell())));
+        newMatrix.add(new ArrayList<Cell>(Arrays.asList(new Cell(), new Cell())));
+        gridTest.setMatrix(newMatrix);
+        assertEquals(newMatrix, gridTest.getMatrix());
     }
 }
