@@ -13,6 +13,7 @@ class CellTest extends AbstractTest {
     public void setCell(){
         int coordX = 1;
         int coordY = 1;
+        int age = 0;
         CellType cellType = new CellType();
         Health health = Health.ok;
 
@@ -22,6 +23,7 @@ class CellTest extends AbstractTest {
         assertEquals(cellType.getColor(),cell.getCellType().getColor());
         assertEquals(coordX, cell.getCoordX());
         assertEquals(coordY, cell.getCoordY());
+        assertEquals(age, cell.getAge());
         assertEquals(health, cell.getHealth());
     }
 
@@ -29,6 +31,7 @@ class CellTest extends AbstractTest {
     public void setCell_withCellType(){
         int coordX = 1;
         int coordY = 1;
+        int age = 0;
         CellType cellType = new CellType("tree", "green");
         Health health = Health.ok;
 
@@ -38,6 +41,7 @@ class CellTest extends AbstractTest {
         assertEquals(cellType.getColor(),cell.getCellType().getColor());
         assertEquals(coordX, cell.getCoordX());
         assertEquals(coordY, cell.getCoordY());
+        assertEquals(age, cell.getAge());
         assertEquals(health, cell.getHealth());
     }
 
@@ -45,6 +49,7 @@ class CellTest extends AbstractTest {
     public void setCell_withSetters(){
         int coordX = 1;
         int coordY = 1;
+        int age = 2;
         CellType cellType = new CellType("tree", "green");
         Health health = Health.ok;
 
@@ -53,11 +58,13 @@ class CellTest extends AbstractTest {
         cell.setHealth(health);
         cell.setCoordX(coordX);
         cell.setCoordY(coordY);
+        cell.setAge(2);
 
         assertEquals(cellType.getName(), cell.getCellType().getName());
         assertEquals(cellType.getColor(),cell.getCellType().getColor());
         assertEquals(coordX, cell.getCoordX());
         assertEquals(coordY, cell.getCoordY());
+        assertEquals(age, cell.getAge());
         assertEquals(health, cell.getHealth());
     }
 
@@ -69,5 +76,13 @@ class CellTest extends AbstractTest {
 
         assertThrows(IllegalArgumentException.class, () -> cell.setCoordX(coordX));
         assertThrows(IllegalArgumentException.class, () -> cell.setCoordY(coordY));
+    }
+
+    @Test
+    public void wrongAge_shouldThrow_IllegalArgumentException(){
+        int age = -2;
+        Cell cell = new Cell();
+
+        assertThrows(IllegalArgumentException.class, () -> cell.setAge(age));
     }
 }
