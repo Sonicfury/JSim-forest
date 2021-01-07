@@ -18,7 +18,6 @@ public class CellType {
      * @param name name of Cell Type
      * @param color color of Cell
      */
-
     public CellType(String name, String color){
         this.name = name;
         this.color = color;

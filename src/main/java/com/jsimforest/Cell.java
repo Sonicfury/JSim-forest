@@ -10,7 +10,6 @@ public class Cell {
     /**
      * Configuration Cell - default
      */
-
     public Cell(){
         this.cellType = new CellType();
         this.coordX = 1;
@@ -25,7 +24,6 @@ public class Cell {
      * @param coordY coordinate of cell on the axe Y
      * @param health state of Cell with enum
      */
-
     public Cell(CellType cellType, int coordX, int coordY, Health health){
         this.cellType = cellType;
         this.coordX = coordX;
