@@ -7,14 +7,23 @@ import static org.junit.jupiter.api.Assertions.*;
 class CellTypeTest extends AbstractTest {
 
     @Test
-    public void setCellType(){
-       CellType cellType = new CellType();
+    public void setEmptyCellType() {
+        CellType cellType = new CellType();
+
+        String name = "null";
+        String color = "null";
+
+        assertEquals(name, cellType.getName());
+        assertEquals(color, cellType.getColor());
+    }
+
+    @Test
+    public void setCellType() {
 
         String name = "tree";
         String color = "green";
 
-        cellType.setName(name);
-        cellType.setColor(color);
+        CellType cellType = new CellType(name, color);
 
         assertEquals(name, cellType.getName());
         assertEquals(color, cellType.getColor());

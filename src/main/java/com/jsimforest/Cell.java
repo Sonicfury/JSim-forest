@@ -7,28 +7,34 @@ public class Cell {
     private int coordY;
     private Health health;
 
+    public Cell() {
+    }
+
     /**
-     * Configuration Cell - default
+     * CellType constructor
+     *
+     * @param coordX X axis coordinate
+     * @param coordY Y axis coordinate
      */
-    public Cell(){
+    public Cell(int coordX, int coordY) {
+        this.coordX = coordX;
+        this.coordY = coordY;
         this.cellType = new CellType();
-        this.coordX = 1;
-        this.coordY = 1;
         this.health = Health.ok;
     }
 
     /**
-     * Overloading Cell Constructor - full
+     * Cell Constructor - overload
+     *
      * @param cellType type of Cell
-     * @param coordX coordinate of cell on the axe X
-     * @param coordY coordinate of cell on the axe Y
-     * @param health state of Cell with enum
+     * @param coordX   coordinate of cell on the axe X
+     * @param coordY   coordinate of cell on the axe Y
      */
-    public Cell(CellType cellType, int coordX, int coordY, Health health){
+    public Cell(CellType cellType, int coordX, int coordY) {
         this.cellType = cellType;
         this.coordX = coordX;
         this.coordY = coordY;
-        this.health = health;
+        this.health = Health.ok;
     }
 
     public CellType getCellType() {
@@ -36,7 +42,6 @@ public class Cell {
     }
 
     /**
-     *
      * @param cellType type of Cell
      */
     public void setCellType(CellType cellType) {
@@ -48,15 +53,13 @@ public class Cell {
     }
 
     /**
-     *
      * @param coordX coordinate of cell on the X axis
      * @throws IllegalArgumentException if the coordinate X is inferior or equal to 0
      */
     public void setCoordX(int coordX) {
-        if(coordX >= 0){
+        if (coordX >= 0) {
             this.coordX = coordX;
-        }
-        else{
+        } else {
             throw new IllegalArgumentException("coordX must be superior or equal to 0");
         }
     }
@@ -66,14 +69,12 @@ public class Cell {
     }
 
     /**
-     *
-     * @param coordY  coordinate of cell on the Y axis
+     * @param coordY coordinate of cell on the Y axis
      */
     public void setCoordY(int coordY) {
-        if(coordY >= 0) {
+        if (coordY >= 0) {
             this.coordY = coordY;
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("coordY must be superior or equal to 0");
         }
     }
@@ -83,10 +84,14 @@ public class Cell {
     }
 
     /**
-     *
      * @param health state of cell with a enum
      */
     public void setHealth(Health health) {
         this.health = health;
+    }
+
+    public boolean equals(Cell cell){
+
+        return this.cellType.equals(cell.getCellType()) && this.coordX == cell.getCoordX() && this.coordY == cell.getCoordY();
     }
 }
