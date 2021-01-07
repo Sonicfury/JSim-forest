@@ -5,6 +5,7 @@ public class Cell {
     private CellType cellType;
     private int coordX;
     private int coordY;
+    private int age = 0;
     private Health health;
 
     public Cell() {
@@ -38,6 +39,7 @@ public class Cell {
     }
 
     public CellType getCellType() {
+
         return cellType;
     }
 
@@ -49,12 +51,13 @@ public class Cell {
     }
 
     public int getCoordX() {
+
         return coordX;
     }
 
     /**
      * @param coordX coordinate of cell on the X axis
-     * @throws IllegalArgumentException if the coordinate X is inferior or equal to 0
+     * @throws IllegalArgumentException if the coordinate X is inferior to 0
      */
     public void setCoordX(int coordX) {
         if (coordX >= 0) {
@@ -65,11 +68,13 @@ public class Cell {
     }
 
     public int getCoordY() {
+
         return coordY;
     }
 
     /**
      * @param coordY coordinate of cell on the Y axis
+     * @throws IllegalArgumentException if the coordinate Y is inferior to 0
      */
     public void setCoordY(int coordY) {
         if (coordY >= 0) {
@@ -79,7 +84,25 @@ public class Cell {
         }
     }
 
+    /**
+     *
+     * @param age How many steps has lived the cell
+     */
+    public void setAge(int age){
+        if (age >= 0) {
+            this.age = age;
+        } else {
+            throw new IllegalArgumentException("Cell age must be superior or equal to 0");
+        }
+    }
+
+    public int getAge() {
+
+        return this.age;
+    }
+
     public Health getHealth() {
+
         return health;
     }
 
@@ -90,7 +113,7 @@ public class Cell {
         this.health = health;
     }
 
-    public boolean equals(Cell cell){
+    public boolean equals(Cell cell) {
 
         return this.cellType.equals(cell.getCellType()) && this.coordX == cell.getCoordX() && this.coordY == cell.getCoordY();
     }

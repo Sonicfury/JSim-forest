@@ -84,16 +84,16 @@ public class Configuration {
     }
 
     /**
-     * The user has to draw a minimum of 5 cells to run a simulation ; therefore, the grid must be at least 2x3 or 3x2
+     * The user has to draw a minimum of 5 cells to run a simulation ; therefore, the grid must be at least 3x3
      *
      * @param gridWidth how many Cells width is the grid
-     * @throws IllegalArgumentException if the width is inferior to 2
+     * @throws IllegalArgumentException if the width is inferior to 3
      */
     public void setGridWidth(int gridWidth) {
-        if (gridWidth >= 2) {
+        if (gridWidth >= 3) {
             this.gridWidth = gridWidth;
         } else {
-            throw new IllegalArgumentException("The grid width must be at least 2");
+            throw new IllegalArgumentException("The grid width must be at least 3");
         }
     }
 
@@ -102,16 +102,16 @@ public class Configuration {
     }
 
     /**
-     * The user has to draw a minimum of 5 cells to run a simulation ; therefore, the grid must be at least 2x3 or 3x2
+     * The user has to draw a minimum of 5 cells to run a simulation ; therefore, the grid must be at least 3x3
      *
      * @param gridHeight how many Cells height is the grid
-     * @throws IllegalArgumentException if the height is inferior to 2
+     * @throws IllegalArgumentException if the height is inferior to 3
      */
     public void setGridHeight(int gridHeight) {
-        if (gridHeight >= 2) {
+        if (gridHeight >= 3) {
             this.gridHeight = gridHeight;
         } else {
-            throw new IllegalArgumentException("The grid height must be at least 2");
+            throw new IllegalArgumentException("The grid height must be at least 3");
         }
     }
 }
