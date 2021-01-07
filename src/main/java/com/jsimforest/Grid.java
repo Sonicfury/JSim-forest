@@ -6,12 +6,12 @@ public class Grid {
     public Grid(int width, int height) {
         setWidth(width);
         setHeight(height);
-        ArrayList<ArrayList<Cell>> matrix = new ArrayList<ArrayList<Cell>>();
+        ArrayList<ArrayList<Cell>> matrix = new ArrayList<>();
         for(int i=0;i<height;i++){
-            matrix.add(new ArrayList<Cell>());
+            matrix.add(new ArrayList<>());
             ArrayList<Cell> line = matrix.get(i);
             for(int j=0;j<width;j++){
-                line.add(new Cell());
+                line.add(new Cell(j, i));
             }
         }
         setMatrix(matrix);
@@ -76,5 +76,18 @@ public class Grid {
         }else{
             throw new IllegalArgumentException();
         }
+    }
+
+    /**
+     *
+     * @param x cell's x coordinate
+     * @param y cell's y coordinate
+     * @param cellType cell's cellType
+     */
+    public void editCell(int x, int y, CellType cellType){
+        ArrayList<Cell> row = this.getMatrix().get(y);
+        Cell cell = row.get(x);
+
+        cell.setCellType(cellType);
     }
 }
