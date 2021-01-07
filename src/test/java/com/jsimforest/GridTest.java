@@ -31,7 +31,7 @@ public class GridTest extends AbstractTest {
         for(int i = 0;i < matrixLines; i++){
             newMatrix.add(new ArrayList<>());
             for (int j = 0; j < matrixColumns; j++){
-                newMatrix.get(i).add(new Cell());
+                newMatrix.get(i).add(new Cell(j, i));
             }
         }
         assertThrows(IllegalArgumentException.class, () -> testGrid.setMatrix(newMatrix));
@@ -40,9 +40,9 @@ public class GridTest extends AbstractTest {
     @Test
     public void SetMatrix(){
         Grid gridTest = new Grid(2, 2);
-        ArrayList<ArrayList<Cell>> newMatrix = new ArrayList<ArrayList<Cell>>();
-        newMatrix.add(new ArrayList<Cell>(Arrays.asList(new Cell(), new Cell())));
-        newMatrix.add(new ArrayList<Cell>(Arrays.asList(new Cell(), new Cell())));
+        ArrayList<ArrayList<Cell>> newMatrix = new ArrayList<>();
+        newMatrix.add(new ArrayList<>(Arrays.asList(new Cell(0, 0), new Cell(0, 1))));
+        newMatrix.add(new ArrayList<>(Arrays.asList(new Cell(1, 0), new Cell(1, 1))));
         gridTest.setMatrix(newMatrix);
         assertEquals(newMatrix, gridTest.getMatrix());
     }

@@ -2,15 +2,15 @@ package com.jsimforest;
 
 public class CellType {
 
-    private String name;
-    private String color;
+    private final String name;
+    private final String color;
 
     /**
      * Configuration CellType - default
      */
     public CellType(){
-        this.name = "tree";
-        this.color = "green";
+        this.name = "null";
+        this.color = "null";
     }
 
     /**
@@ -24,26 +24,17 @@ public class CellType {
     }
 
     public String getName() {
+
         return name;
     }
 
-    /**
-     *
-     * @param name name type of cell
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getColor() {
+
         return color;
     }
 
-    /**
-     *
-     * @param color color of type
-     */
-    public void setColor(String color) {
-        this.color = color;
+    public boolean equals(CellType cellType){
+
+        return this.getName().equals(cellType.getName()) && this.getColor().equals(cellType.getColor());
     }
 }

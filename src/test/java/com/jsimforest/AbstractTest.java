@@ -21,6 +21,6 @@ public class AbstractTest {
 
         Instant endedAt = Instant.now();
         long duration = Duration.between(startedAt, endedAt).toMillis();
-        System.out.println(MessageFormat.format("Tests duration : {0} ms", duration));
+        System.out.println(MessageFormat.format("Test duration : {0} ms", duration));
     }
 }
