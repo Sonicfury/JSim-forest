@@ -1,0 +1,71 @@
+$background : hsl(218,23.1%,22.9%);
+$null: hsl(0,0%,100%);
+$plant: hsl(88, 57.7%, 56.5%);
+$yougTree: hsl(120, 50%, 40%);
+$tree: hsl(120, 100%, 14.1%);
+
+.mainHbox{
+    -fx-background-color: $background;
+}
+
+.cell{
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+}
+
+.null{
+    -fx-background-color: $null;
+}
+
+.plant{
+    -fx-background-color: $plant;
+}
+
+.yougTree{
+    -fx-background-color: $yougTree;
+}
+
+.tree{
+    -fx-background-color: $tree;
+}
+
+#configDiv {
+    -fx-background-color: hsl(196, 37%, 56%);
+    -fx-min-width: 600;
+    -fx-min-height: 1020;
+    -fx-border-radius: 10 10 10 10;
+
+    .buttonsGrid{
+
+        .button{
+            -fx-background-color: $background;
+            -fx-font-size: 18;
+            -fx-max-width: 255;
+            -fx-min-width: 255;
+            -fx-text-fill: white;
+
+            &:hover{
+                -fx-text-fill: red;
+            }
+        }
+    }
+
+    .controlButtons{
+        .playButton{
+            -fx-min-width: 104;
+            -fx-max-width: 104;
+            -fx-max-height: 104;
+            -fx-min-height: 104;
+            -fx-background-color: $background;
+        }
+    }
+
+    .configTitle{
+        -fx-font-size: 30;
+        -fx-text-alignment: center;
+    }
+
+    .label{
+        -fx-font-size: 20;
+    }
+}
