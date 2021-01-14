@@ -1,30 +1,25 @@
 package com.jsimforest;
 
+import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.application.Application;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 public class Client extends Application{
     public static double winWidth;
@@ -56,6 +51,7 @@ public class Client extends Application{
         root.getChildren().add(gridPane);
         int simHeight = 50;
         int simWidth = 50;
+
         for(int i = 0; i < simHeight;i++){
             for (int j = 0;j < simWidth; j++){
                 Pane newCell = new Pane();
@@ -66,12 +62,14 @@ public class Client extends Application{
                 gridPane.getChildren().add(newCell);
             }
         }
+
         //Config interface
         VBox rectDivConfig = new VBox();
         rectDivConfig.setId("configDiv");
         GridPane formular = new GridPane();
         formular.setVgap(25);
         formular.setAlignment(Pos.BASELINE_CENTER);
+
         // Titre de la zone de configuration
         Text configTitle = new Text("Configurez votre simulation");
         configTitle.getStyleClass().add("configTitle");
@@ -120,6 +118,7 @@ public class Client extends Application{
         configButtons.getStyleClass().add("buttonsGrid");
         configButtons.setVgap(20);
         configButtons.setHgap(20);
+
         Button saveConfig = new Button("Sauvegarder configuration");
         saveConfig.getStyleClass().add("button");
         Button loadConfig = new Button("Charger configuration");
@@ -128,13 +127,13 @@ public class Client extends Application{
         exportGrid.getStyleClass().add("button");
         Button importGrid = new Button("Importer la grille");
         importGrid.getStyleClass().add("button");
+
         configButtons.add(saveConfig, 0, 0);
         configButtons.add(loadConfig, 0, 1);
         configButtons.add(exportGrid, 1, 0);
         configButtons.add(importGrid, 1, 1);
 
         //Simulation control
-
         HBox controlButtons = new HBox();
         controlButtons.setPadding(new Insets(400, 15, 0, 15));
         controlButtons.getStyleClass().add("controlButtons");
@@ -190,16 +189,13 @@ public class Client extends Application{
         stepForwardSVG.setFill(Color.WHITE);
         stepForward.getStyleClass().add("playButton");
         controlButtons.getChildren().add(stepForward);
-
-
-
-
         rectDivConfig.getChildren().add(configButtons);
         rectDivConfig.getChildren().add(controlButtons);
+
         root.getChildren().add(rectDivConfig);
+
+        // Rendering stage
         stage.setMaximized(true);
-        stage.setWidth(bounds.getWidth());
-        stage.setHeight(bounds.getHeight());
         stage.setScene(scene);
         stage.setTitle("Simulation JSIMForest");
         stage.show();
