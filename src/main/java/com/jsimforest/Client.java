@@ -1,7 +1,6 @@
 package com.jsimforest;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -10,10 +9,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -47,23 +47,29 @@ public class Client extends Application implements PropertyChangeListener {
         launch();
     }
 
-    private static void generateGrid(Pane gridRootPane, int width, int height){
+    private void generateGrid(Pane gridRootPane, int width, int height){
         for(int i = 0; i < width;i++){
             for (int j = 0;j < height; j++){
                 Pane newCell = new Pane();
                 newCell.setLayoutX(i*20);
                 newCell.setLayoutY(j*20);
                 newCell.setMinSize(20, 20);
-                newCell.getStyleClass().addAll(Arrays.asList("null", "cell"));
+                newCell.getStyleClass().addAll(Arrays.asList("cell", "null"));
+                newCell.setOnMouseClicked(event -> {
+                    String actualState = newCell.getStyleClass().get(1);
+                    newCell.getStyleClass().remove(actualState);
+                    System.out.println(this.cycleTypes(actualState));
+                    newCell.getStyleClass().add(this.cycleTypes(actualState));
+                });
                 gridRootPane.getChildren().add(newCell);
             }
         }
     }
 
-    private static void regenerateGrid(Pane gridRootPane, String width, String height){
+    private void regenerateGrid(Pane gridRootPane, String width, String height){
         try{
             gridRootPane.getChildren().clear();
-            generateGrid(gridRootPane, parseInt(width), parseInt(height));
+            this.generateGrid(gridRootPane, parseInt(width), parseInt(height));
             System.out.println(gridRootPane.getChildren().size());
         }catch(NumberFormatException e){
             System.out.println("Veuillez saisir un nombre valide");
@@ -71,7 +77,26 @@ public class Client extends Application implements PropertyChangeListener {
 
     }
 
+    public String cycleTypes(String currentType) {
+        switch (currentType){
+            case "null":
+                return "plant";
+            case "plant":
+                return "youngTree";
+            case "youngTree":
+                return "tree";
+            case "tree":
+                return "null";
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     public void start(Stage stage){
+        //Default config
+        Configuration defaultConfig = new Configuration();
+        Simulation defaultSimulation = new Simulation(defaultConfig);
+
         // Getting screen dimension
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
@@ -137,10 +162,11 @@ public class Client extends Application implements PropertyChangeListener {
         gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> regenerateGrid(gridPane, gridWidthField.getText(), gridHeightField.getText()));
 
         //Champ de nombre de pas
-        Label simulationStepLabel = new Label("Nombre de pas dans la grille : ");
+        Label simulationStepLabel = new Label("Nombre de pas : ");
         simulationStepLabel.getStyleClass().add("label");
         formulary.add(simulationStepLabel, 0, 3);
         TextField simulationStepField = new TextField();
+        simulationStepField.setText("20");
         simulationStepField.getStyleClass().add("field");
         formulary.add(simulationStepField, 1, 3);
 
@@ -149,6 +175,7 @@ public class Client extends Application implements PropertyChangeListener {
         simulationSpeedLabel.getStyleClass().add("label");
         formulary.add(simulationSpeedLabel, 0, 4);
         TextField simulationSpeedField = new TextField();
+        simulationSpeedField.setText("1");
         simulationSpeedField.getStyleClass().add("field");
         formulary.add(simulationSpeedField, 1, 4);
         rectDivConfig.getChildren().add(formulary);
@@ -190,12 +217,7 @@ public class Client extends Application implements PropertyChangeListener {
         playSVG.setScaleY(0.1);
         playSVG.setFill(Color.WHITE);
         playButton.getStyleClass().add("playButton");
-        playButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                System.out.println(event.getClickCount());
-            }
-        });
+        playButton.setOnMouseClicked(event -> System.out.println(event.getClickCount()));
         controlButtons.getChildren().add(playButton);
 
         // Pause button
