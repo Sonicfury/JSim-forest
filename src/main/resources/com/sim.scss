@@ -29,6 +29,13 @@ $tree: hsl(120, 100%, 14.1%);
     -fx-background-color: $tree;
 }
 
+.scroller{
+    -fx-max-width: 1040;
+    -fx-min-width: 1040;
+    -fx-background: $background;
+    -fx-border-color: $background;
+}
+
 #configDiv {
     -fx-background-color: hsl(196, 37%, 56%);
     -fx-min-width: 600;

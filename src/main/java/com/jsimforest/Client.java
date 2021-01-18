@@ -1,18 +1,19 @@
 package com.jsimforest;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -46,6 +47,30 @@ public class Client extends Application implements PropertyChangeListener {
         launch();
     }
 
+    private static void generateGrid(Pane gridRootPane, int width, int height){
+        for(int i = 0; i < width;i++){
+            for (int j = 0;j < height; j++){
+                Pane newCell = new Pane();
+                newCell.setLayoutX(i*20);
+                newCell.setLayoutY(j*20);
+                newCell.setMinSize(20, 20);
+                newCell.getStyleClass().addAll(Arrays.asList("null", "cell"));
+                gridRootPane.getChildren().add(newCell);
+            }
+        }
+    }
+
+    private static void regenerateGrid(Pane gridRootPane, String width, String height){
+        try{
+            gridRootPane.getChildren().clear();
+            generateGrid(gridRootPane, parseInt(width), parseInt(height));
+            System.out.println(gridRootPane.getChildren().size());
+        }catch(NumberFormatException e){
+            System.out.println("Veuillez saisir un nombre valide");
+        }
+
+    }
+
     public void start(Stage stage){
         // Getting screen dimension
         Screen screen = Screen.getPrimary();
@@ -60,32 +85,24 @@ public class Client extends Application implements PropertyChangeListener {
         root.setPadding(new Insets(10, 10, 10, 10));
         root.setMinWidth(winWidth);
         root.setMinHeight(winHeight);
-        Scene scene = new Scene(root, winHeight, winWidth);
+        Scene scene = new Scene(root, winWidth, winHeight);
         scene.getStylesheets().add(getClass().getResource("/com/sim.css").toExternalForm());
 
         // Setting grid Scene
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.getStyleClass().add("scroller");
+        root.getChildren().add(scrollPane);
         Pane gridPane = new Pane();
-        root.getChildren().add(gridPane);
-        int simHeight = 50;
-        int simWidth = 50;
+        gridPane.getStyleClass().add("gridPane");
+//        root.getChildren().add(gridPane);
 
-        for(int i = 0; i < simHeight;i++){
-            for (int j = 0;j < simWidth; j++){
-                Pane newCell = new Pane();
-                newCell.setLayoutX(i*20);
-                newCell.setLayoutY(j*20);
-                newCell.setMinSize(20, 20);
-                newCell.getStyleClass().addAll(Arrays.asList("null", "cell"));
-                gridPane.getChildren().add(newCell);
-            }
-        }
 
         //Config interface
         VBox rectDivConfig = new VBox();
         rectDivConfig.setId("configDiv");
-        GridPane formular = new GridPane();
-        formular.setVgap(25);
-        formular.setAlignment(Pos.BASELINE_CENTER);
+        GridPane formulary = new GridPane();
+        formulary.setVgap(25);
+        formulary.setAlignment(Pos.BASELINE_CENTER);
 
         // Titre de la zone de configuration
         Text configTitle = new Text("Configurez votre simulation");
@@ -98,35 +115,43 @@ public class Client extends Application implements PropertyChangeListener {
         //Champ de largeur grille
         Label gridWidthLabel = new Label("Largeur de la grille : ");
         gridWidthLabel.getStyleClass().add("label");
-        formular.add(gridWidthLabel, 0, 1);
+        formulary.add(gridWidthLabel, 0, 1);
         TextField gridWidthField = new TextField();
         gridWidthField.getStyleClass().add("field");
-        formular.add(gridWidthField, 1, 1);
+        gridWidthField.setText("100");
+        formulary.add(gridWidthField, 1, 1);
 
         // Champ de hauteur de grille
         Label gridHeightLabel = new Label("Hauteur de la grille : ");
         gridHeightLabel.getStyleClass().add("label");
-        formular.add(gridHeightLabel, 0, 2);
+        formulary.add(gridHeightLabel, 0, 2);
         TextField gridHeightField = new TextField();
         gridHeightField.getStyleClass().add("field");
-        formular.add(gridHeightField, 1, 2);
+        gridHeightField.setText("100");
+        formulary.add(gridHeightField, 1, 2);
+
+        // Générationd de la grille et rechargement de la grille
+        generateGrid(gridPane, parseInt(gridWidthField.getText()), parseInt(gridHeightField.getText()));
+        scrollPane.setContent(gridPane);
+        gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> regenerateGrid(gridPane, gridWidthField.getText(), gridHeightField.getText()));
+        gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> regenerateGrid(gridPane, gridWidthField.getText(), gridHeightField.getText()));
 
         //Champ de nombre de pas
         Label simulationStepLabel = new Label("Nombre de pas dans la grille : ");
         simulationStepLabel.getStyleClass().add("label");
-        formular.add(simulationStepLabel, 0, 3);
+        formulary.add(simulationStepLabel, 0, 3);
         TextField simulationStepField = new TextField();
         simulationStepField.getStyleClass().add("field");
-        formular.add(simulationStepField, 1, 3);
+        formulary.add(simulationStepField, 1, 3);
 
         //Champ de la vitesse d'éxécution
-        Label simulationSpeedLabel = new Label("Nombre de pas dans la grille : ");
+        Label simulationSpeedLabel = new Label("Vitesse d'éxecution de la grille : ");
         simulationSpeedLabel.getStyleClass().add("label");
-        formular.add(simulationSpeedLabel, 0, 4);
+        formulary.add(simulationSpeedLabel, 0, 4);
         TextField simulationSpeedField = new TextField();
         simulationSpeedField.getStyleClass().add("field");
-        formular.add(simulationSpeedField, 1, 4);
-        rectDivConfig.getChildren().add(formular);
+        formulary.add(simulationSpeedField, 1, 4);
+        rectDivConfig.getChildren().add(formulary);
 
         // Boutons configuration
         GridPane configButtons = new GridPane();
@@ -165,6 +190,12 @@ public class Client extends Application implements PropertyChangeListener {
         playSVG.setScaleY(0.1);
         playSVG.setFill(Color.WHITE);
         playButton.getStyleClass().add("playButton");
+        playButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                System.out.println(event.getClickCount());
+            }
+        });
         controlButtons.getChildren().add(playButton);
 
         // Pause button
