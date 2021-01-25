@@ -44,6 +44,19 @@ public class Grid {
         }
     }
 
+    @Override
+    public Object clone() {
+        ArrayList<ArrayList<Cell>> matrixClone = new ArrayList<ArrayList<Cell>>();
+        System.out.println("clonage");
+        for (ArrayList<Cell> line : this.getMatrix() ){
+            matrixClone.add(new ArrayList<Cell>());
+            for(Cell cell : line){
+                matrixClone.get(matrixClone.size() - 1).add(cell.clone());
+            }
+        }
+        return matrixClone;
+    }
+
     public int getWidth() {
         return width;
     }
