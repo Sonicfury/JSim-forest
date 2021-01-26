@@ -1,7 +1,6 @@
 package com.jsimforest;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 
 public class Simulation {
@@ -25,10 +24,30 @@ public class Simulation {
         return this.step;
     }
 
-    public void run() {
+    public int getElapsedTime() {
+
+        return elapsedTime;
+    }
+
+    /*public void pause(){
+        this.pause = true;
+    }
+
+    public void resume(){
+        this.pause = false;
+    }*/
+
+    public void run() throws InterruptedException {
+        double stepsPerSecond = this.configuration.getStepsPerSecond();
+        int interval = (int)(stepsPerSecond * 1000);
+
         while (this.step < this.configuration.getStepsNumber()){
             // this.step incremented in step()
-            this.step();
+            if (!this.pause){
+                this.step();
+                Thread.sleep(interval);
+                this.elapsedTime = this.step * interval;
+            }
         }
     }
 
@@ -81,6 +100,7 @@ public class Simulation {
                 }
             }
         }
+
         for(Cell cell: toPlant){
             cell.setCellType(plantType);
             cell.setAge(0);
