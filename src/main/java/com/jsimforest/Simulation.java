@@ -7,11 +7,15 @@ public class Simulation {
     private final Configuration configuration;
     private Grid grid;
     private int step;
+    private int elapsedTime;
+    private boolean pause;
+    public PCLStep stepObservable;
 
     public Simulation(Configuration config) {
         this.configuration = config;
         this.grid = new Grid(config.getGridWidth(), config.getGridHeight());
         this.step = 0;
+        this.stepObservable = new PCLStep();
     }
 
     public Grid getGrid() {
@@ -115,5 +119,6 @@ public class Simulation {
         }
 
         this.step += 1;
+        this.stepObservable.setStep(this.step);
     }
 }
