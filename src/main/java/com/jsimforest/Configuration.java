@@ -21,11 +21,12 @@ public class Configuration {
 
     /**
      * Overloading Configuration Constructor - full
+     *
      * @param stepsPerSecond the number of steps per second for the simulation
-     * @param stepsNumber the number of steps for the simulation
-     * @param mode the simulation's mode to run (forest -- default, insect, fire)
-     * @param gridWidth how many Cells width is the grid
-     * @param gridHeight how many Cells height is the grid
+     * @param stepsNumber    the number of steps for the simulation
+     * @param mode           the simulation's mode to run (forest -- default, insect, fire)
+     * @param gridWidth      how many Cells width is the grid
+     * @param gridHeight     how many Cells height is the grid
      */
     public Configuration(double stepsPerSecond, int stepsNumber, Mode mode, int gridWidth, int gridHeight) {
         this.stepsPerSecond = stepsPerSecond;
@@ -46,7 +47,7 @@ public class Configuration {
      * @throws IllegalArgumentException if the number of steps per second is inferior or equal to 0
      */
     public void setStepsPerSecond(double stepsPerSecond) {
-        if (stepsPerSecond > 0) {
+        if (stepsPerSecond > 0.001) {
             this.stepsPerSecond = stepsPerSecond;
         } else {
             throw new IllegalArgumentException("The number of steps per second must be superior to 0");
