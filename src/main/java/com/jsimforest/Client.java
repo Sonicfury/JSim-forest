@@ -19,11 +19,29 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 
-public class Client extends Application{
+public class Client extends Application implements PropertyChangeListener {
     public static double winWidth;
     public static double winHeight;
+
+    private int step;
+
+    public int getStep() {
+        return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        this.setStep((int) evt.getNewValue());
+
+    }
 
     public static void startUI(){
         launch();
