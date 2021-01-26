@@ -15,7 +15,7 @@ class SimulationTest extends AbstractTest {
     private static final CellType plantType = new CellType("plant", "lightGreen");
     private static final CellType youngTreeType = new CellType("youngTree", "mediumGreen");
     private static final CellType treeType = new CellType("tree", "green");
-    
+
     @Test
     public void setGridInitialState_fromConfiguration() {
         Configuration config = new Configuration(1, 10, Mode.forest, 5, 5);
@@ -53,13 +53,30 @@ class SimulationTest extends AbstractTest {
     }
 
     @Test
+    public void observeGridChanges() {
+        Configuration config = new Configuration(10,2, Mode.forest, 3, 3);
+        Simulation simulation = new Simulation(config);
+
+        Client clientObserver = new Client();
+        simulation.stepObservable.addPropertyChangeListener(clientObserver);
+
+
+        simulation.step();
+        assertEquals(1, clientObserver.getStep());
+        simulation.step();
+        assertEquals(2, clientObserver.getStep());
+    }
+
+    @Test
     public void runSimulation() {
         int stepsNumber = 10;
+        int stepsPerSecond = 1;
         ArrayList<ArrayList<Cell>> matrix = createMatrix();
 
-        Configuration config = new Configuration(1, stepsNumber, Mode.forest, 5, 5);
+        Configuration config = new Configuration(stepsPerSecond, stepsNumber, Mode.forest, 5, 5);
         Simulation simulation = new Simulation(config);
         simulation.getGrid().setMatrix(matrix);
+        int expectedElapsedTime = (stepsNumber / stepsPerSecond) * 1000;
 
         ArrayList<ArrayList<Cell>> copyMatrix = createMatrix();
         Simulation copySimulation = new Simulation(config);
@@ -67,10 +84,15 @@ class SimulationTest extends AbstractTest {
 
         Grid copyGrid = copySimulation.getGrid();
 
-        simulation.run();
+        try {
+            simulation.run();
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
 
         assertEquals(stepsNumber, simulation.getStep());
         assertFalse(copyGrid.equals(simulation.getGrid()));
+        assertEquals(expectedElapsedTime, simulation.getElapsedTime());
     }
 
     @ParameterizedTest
@@ -134,7 +156,11 @@ class SimulationTest extends AbstractTest {
 
         simulation.getGrid().setMatrix(matrix);
 
-        simulation.run();
+        try {
+            simulation.run();
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
 
         ArrayList<ArrayList<Cell>> simMatrix = simulation.getGrid().getMatrix();
         Cell simCell = simMatrix.get(1).get(1);
