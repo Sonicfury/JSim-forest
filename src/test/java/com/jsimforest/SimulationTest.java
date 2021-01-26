@@ -53,7 +53,7 @@ class SimulationTest extends AbstractTest {
     }
 
     @Test
-    public void observeGridChanges() {
+    public void observeSimulationChanges() {
         Configuration config = new Configuration(10,2, Mode.forest, 3, 3);
         Simulation simulation = new Simulation(config);
 
