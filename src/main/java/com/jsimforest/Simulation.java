@@ -43,11 +43,11 @@ public class Simulation {
 
     public void run() throws InterruptedException {
         double stepsPerSecond = this.configuration.getStepsPerSecond();
-        int interval = (int)(stepsPerSecond * 1000);
+        int interval = (int) (1000 / stepsPerSecond);
 
-        while (this.step < this.configuration.getStepsNumber()){
+        while (this.step < this.configuration.getStepsNumber()) {
             // this.step incremented in step()
-            if (!this.pause){
+            if (!this.pause) {
                 this.step();
                 Thread.sleep(interval);
                 this.elapsedTime = this.step * interval;
@@ -66,18 +66,18 @@ public class Simulation {
         ArrayList<Cell> toTree = new ArrayList<>();
 
 
-        for (int i = 0; i < matrix.size(); i++){
-            for (int j = 0; j< matrix.get(i).size(); j++){
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = 0; j < matrix.get(i).size(); j++) {
                 Cell centralCell = matrix.get(i).get(j);
                 List<String> cellTypesList = new ArrayList<>();
 
-                for (int k = i-1; k <= i+1; k++){
-                    if (k >= 0 && k < matrix.size()){
-                        for(int l= j-1; l<= j+1; l++){
+                for (int k = i - 1; k <= i + 1; k++) {
+                    if (k >= 0 && k < matrix.size()) {
+                        for (int l = j - 1; l <= j + 1; l++) {
                             // do not add centralCell's cellType to the list
-                            if (i == k && j == l){
+                            if (i == k && j == l) {
                                 continue;
-                            } else if (l >= 0 && l < matrix.get(i).size()){
+                            } else if (l >= 0 && l < matrix.get(i).size()) {
                                 Cell c = matrix.get(k).get(l);
                                 cellTypesList.add(c.getCellType().getName());
                             }
@@ -91,29 +91,29 @@ public class Simulation {
                 int youngTreeTypeCount = Collections.frequency(cellTypesList, youngTreeType.getName());
                 int treeTypeCount = Collections.frequency(cellTypesList, treeType.getName());
 
-                if (centralCell.getCellType().getName().equals("youngTree") && centralCell.getAge() == 2){
+                if (centralCell.getCellType().getName().equals("youngTree") && centralCell.getAge() == 2) {
                     toTree.add(centralCell);
                 }
-                if (centralCell.getCellType().getName().equals("plant") && (treeTypeCount + youngTreeTypeCount) <= 3){
+                if (centralCell.getCellType().getName().equals("plant") && (treeTypeCount + youngTreeTypeCount) <= 3) {
                     toYoungTree.add(centralCell);
                 }
                 if (centralCell.getCellType().getName().equals("null") && (
-                        treeTypeCount >=2 || youngTreeTypeCount >= 3 || (treeTypeCount == 1 && youngTreeTypeCount == 2)
-                )){
+                        treeTypeCount >= 2 || youngTreeTypeCount >= 3 || (treeTypeCount == 1 && youngTreeTypeCount == 2)
+                )) {
                     toPlant.add(centralCell);
                 }
             }
         }
 
-        for(Cell cell: toPlant){
+        for (Cell cell : toPlant) {
             cell.setCellType(plantType);
             cell.setAge(0);
         }
-        for (Cell cell: toYoungTree){
+        for (Cell cell : toYoungTree) {
             cell.setCellType(youngTreeType);
             cell.setAge(0);
         }
-        for (Cell cell: toTree){
+        for (Cell cell : toTree) {
             cell.setCellType(treeType);
             cell.setAge(0);
         }
