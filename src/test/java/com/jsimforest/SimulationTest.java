@@ -60,7 +60,6 @@ class SimulationTest extends AbstractTest {
         Client clientObserver = new Client();
         simulation.stepObservable.addPropertyChangeListener(clientObserver);
 
-
         simulation.step();
         assertEquals(1, clientObserver.getStep());
         simulation.step();

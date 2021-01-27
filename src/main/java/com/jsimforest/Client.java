@@ -40,7 +40,6 @@ public class Client extends Application implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         this.setStep((int) evt.getNewValue());
-
     }
 
     public static void startUI(){
