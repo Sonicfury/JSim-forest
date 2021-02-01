@@ -1,5 +1,6 @@
 package com.jsimforest;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -54,6 +56,8 @@ public class Client extends Application implements PropertyChangeListener {
     private Simulation simulation;
     private Configuration simulationConfig;
     private Simulation initialState;
+
+    PauseTransition pause = new PauseTransition(Duration.seconds(0.8));
 
     private void generateGrid(Pane gridRootPane){
         System.out.print("H : ");
@@ -197,13 +201,19 @@ public class Client extends Application implements PropertyChangeListener {
         generateGrid(gridPane);
         scrollPane.setContent(gridPane);
         gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> {
-            this.simulationConfig.setGridWidth(parseInt(gridWidthField.getText()));
-            this.simulation.newGrid();
-            changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
+            pause.setOnFinished(event -> {
+                this.simulationConfig.setGridWidth(parseInt(gridWidthField.getText()));
+                this.simulation.newGrid();
+                changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
+            });
+            pause.playFromStart();
         });
         gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> {
-            this.simulationConfig.setGridHeight(parseInt(gridHeightField.getText()));
-            changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
+            pause.setOnFinished(event -> {
+                this.simulationConfig.setGridHeight(parseInt(gridHeightField.getText()));
+                changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
+            });
+            pause.playFromStart();
         });
 
         //Champ de nombre de pas
