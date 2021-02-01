@@ -43,6 +43,11 @@ public class Cell {
         return cellType;
     }
 
+    @Override
+    public Cell clone(){
+        return new Cell(this.cellType, this.coordX, this.coordY);
+    }
+
     /**
      * @param cellType type of Cell
      */
