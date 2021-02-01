@@ -15,19 +15,12 @@
   -fx-background-color: #94d050;
 }
 
-.youngTree {
+.yougTree {
   -fx-background-color: #339933;
 }
 
 .tree {
   -fx-background-color: #004800;
-}
-
-.scroller {
-  -fx-max-width: 1040;
-  -fx-min-width: 1040;
-  -fx-background: #2d3748;
-  -fx-border-color: #2d3748;
 }
 
 #configDiv {

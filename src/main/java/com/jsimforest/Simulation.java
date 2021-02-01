@@ -1,6 +1,10 @@
 package com.jsimforest;
 
-import java.util.*;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Simulation {
@@ -20,7 +24,7 @@ public class Simulation {
 
     public void newGrid(){
         this.grid = new Grid(this.configuration.getGridWidth(), this.configuration.getGridHeight());
-    };
+    }
 
     public Grid getGrid() {
 
@@ -124,5 +128,25 @@ public class Simulation {
 
         this.step += 1;
         this.stepObservable.setStep(this.step);
+    }
+
+    /**
+     *
+     * @throws SQLException sql exception
+     */
+    public void saveSimulation(String name, int idGrid, int idConfiguration) throws SQLException {
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        String creationDate = "'" + format.format(new java.util.Date()) + "'" ;
+
+        String nameReformat = "'" + name + "'" ;
+
+        String sql = MessageFormat.format(
+
+                "INSERT INTO Simulations (name, steps, creationDate, id_Grids, id_Configurations) VALUES ( {0}, {1}, {2}, {3}, {4}  )",
+                nameReformat, this.step, creationDate, idGrid, idConfiguration);
+
+        DataBaseInterface.insert(sql);
     }
 }
