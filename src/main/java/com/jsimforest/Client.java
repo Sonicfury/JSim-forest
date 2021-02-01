@@ -56,8 +56,12 @@ public class Client extends Application implements PropertyChangeListener {
     private Simulation initialState;
 
     private void generateGrid(Pane gridRootPane){
-        for(int i = 0; i < this.simulationConfig.getGridHeight();i++){
-            for (int j = 0;j < this.simulationConfig.getGridWidth(); j++){
+        System.out.print("H : ");
+        System.out.println(this.simulationConfig.getGridHeight());
+        System.out.print("L : ");
+        System.out.println(this.simulationConfig.getGridWidth());
+        for(int i = 0; i < this.simulationConfig.getGridWidth();i++){
+            for (int j = 0;j < this.simulationConfig.getGridHeight(); j++){
                 Pane newCell = new Pane();
                 newCell.setLayoutX(i*20);
                 newCell.setLayoutY(j*20);
