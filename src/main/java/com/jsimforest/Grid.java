@@ -3,6 +3,7 @@ package com.jsimforest;
 import java.util.ArrayList;
 
 public class Grid {
+
     public Grid(int width, int height) {
         setWidth(width);
         setHeight(height);
@@ -40,8 +41,22 @@ public class Grid {
             }
             this.matrix = matrix;
         }else{
+            System.out.println(matrix.size());
+            System.out.println(this.getHeight());
             throw new IllegalArgumentException();
         }
+    }
+
+    @Override
+    public Object clone() {
+        ArrayList<ArrayList<Cell>> matrixClone = new ArrayList<ArrayList<Cell>>();
+        for (ArrayList<Cell> line : this.getMatrix() ){
+            matrixClone.add(new ArrayList<Cell>());
+            for(Cell cell : line){
+                matrixClone.get(matrixClone.size() - 1).add(cell.clone());
+            }
+        }
+        return matrixClone;
     }
 
     public int getWidth() {
