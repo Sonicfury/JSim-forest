@@ -5,6 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class CellTest extends AbstractTest {
@@ -84,5 +86,13 @@ class CellTest extends AbstractTest {
         Cell cell = new Cell();
 
         assertThrows(IllegalArgumentException.class, () -> cell.setAge(age));
+    }
+
+    @Test
+    public void testSaveCell() {
+
+        Cell cell = new Cell();
+
+        assertDoesNotThrow(()-> cell.saveCell(1, 1));
     }
 }

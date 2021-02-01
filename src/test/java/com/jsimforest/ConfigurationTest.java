@@ -5,6 +5,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigurationTest extends AbstractTest {
@@ -85,5 +88,15 @@ class ConfigurationTest extends AbstractTest {
 
         assertThrows(IllegalArgumentException.class, () -> config.setStepsPerSecond(stepsPerSecond));
         assertThrows(IllegalArgumentException.class, () -> config.setStepsNumber(stepsNumber));
+    }
+    @Test
+    public void testSaveConfiguration() {
+
+        Configuration config = new Configuration();
+
+        String name = "test sauvegarde configuration";
+
+        assertDoesNotThrow(()-> config.saveConfiguration(name));
+
     }
 }
