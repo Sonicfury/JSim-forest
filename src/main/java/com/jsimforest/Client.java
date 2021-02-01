@@ -84,7 +84,7 @@ public class Client extends Application implements PropertyChangeListener {
             gridRootPane.getChildren().clear();
             this.generateGrid(gridRootPane);
         }catch(NumberFormatException e){
-            System.out.println("Veuillez saisir un nombre valide");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -273,7 +273,6 @@ public class Client extends Application implements PropertyChangeListener {
         playSVG.setScaleY(0.1);
         playSVG.setFill(Color.WHITE);
         playButton.getStyleClass().add("playButton");
-        playButton.setOnMouseClicked(event -> System.out.println(event.getClickCount()));
         controlButtons.getChildren().add(playButton);
 
         // Pause button
@@ -298,7 +297,6 @@ public class Client extends Application implements PropertyChangeListener {
             gridWidthField.setDisable(false);
             simulationSpeedField.setDisable(false);
             simulationStepField.setDisable(false);
-            System.out.println(this.simulationConfig.getGridHeight());
             this.simulation = new Simulation(this.simulationConfig);
             Collections.copy(this.simulation.getGrid().getMatrix(), this.initialState.getGrid().getMatrix());
             this.initialState = null;
@@ -353,10 +351,5 @@ public class Client extends Application implements PropertyChangeListener {
         stage.setScene(scene);
         stage.setTitle("Simulation JSIMForest");
         stage.show();
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-
     }
 }

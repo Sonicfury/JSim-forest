@@ -1,5 +1,8 @@
 package com.jsimforest;
 
+import java.sql.SQLException;
+import java.text.MessageFormat;
+
 public class Cell {
 
     private CellType cellType;
@@ -122,4 +125,20 @@ public class Cell {
 
         return this.cellType.equals(cell.getCellType()) && this.coordX == cell.getCoordX() && this.coordY == cell.getCoordY();
     }
+
+    /**
+     *
+     * @throws SQLException sql exception
+     */
+
+    public void saveCell(int idType, int idGrid) throws SQLException {
+
+        String sql = MessageFormat.format(
+                "INSERT INTO Cells (coordX, coordY, health, id_Types, id_Grids) VALUES ( {0}, {1}, {2}, {3}, {4} )",
+                this.coordX, this.coordY, this.health, idType, idGrid);
+
+        DataBaseInterface.insert(sql);
+    }
+
+
 }
