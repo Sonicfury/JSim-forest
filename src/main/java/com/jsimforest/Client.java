@@ -57,13 +57,9 @@ public class Client extends Application implements PropertyChangeListener {
     private Configuration simulationConfig;
     private Simulation initialState;
 
-    PauseTransition pause = new PauseTransition(Duration.seconds(0.8));
+    PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
 
     private void generateGrid(Pane gridRootPane){
-        System.out.print("H : ");
-        System.out.println(this.simulationConfig.getGridHeight());
-        System.out.print("L : ");
-        System.out.println(this.simulationConfig.getGridWidth());
         for(int i = 0; i < this.simulationConfig.getGridWidth();i++){
             for (int j = 0;j < this.simulationConfig.getGridHeight(); j++){
                 Pane newCell = new Pane();
@@ -201,17 +197,22 @@ public class Client extends Application implements PropertyChangeListener {
         generateGrid(gridPane);
         scrollPane.setContent(gridPane);
         gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> {
-            pause.setOnFinished(event -> {
-                this.simulationConfig.setGridWidth(parseInt(gridWidthField.getText()));
-                this.simulation.newGrid();
-                changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
-            });
-            pause.playFromStart();
+            if(parseInt(newValue) > 3){
+                pause.setOnFinished(event -> {
+                    this.simulationConfig.setGridWidth(parseInt(newValue));
+                    this.simulation.newGrid();
+                    changeGridSize(gridPane, newValue, gridHeightField.getText());
+                });
+                pause.playFromStart();
+            }
+
         });
         gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(parseInt(newValue) > 3)
             pause.setOnFinished(event -> {
-                this.simulationConfig.setGridHeight(parseInt(gridHeightField.getText()));
-                changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
+                this.simulationConfig.setGridHeight(parseInt(newValue));
+                this.simulation.newGrid();
+                changeGridSize(gridPane, gridWidthField.getText(), newValue);
             });
             pause.playFromStart();
         });
@@ -337,7 +338,6 @@ public class Client extends Application implements PropertyChangeListener {
             simulationStepField.setDisable(true);
             if(this.initialState == null){
                 this.initialState = new Simulation(this.simulationConfig);
-                System.out.println(this.simulationConfig.getGridHeight());
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
             }
             this.simulation.step();
