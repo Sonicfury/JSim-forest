@@ -40,6 +40,8 @@ public class Grid {
             }
             this.matrix = matrix;
         }else{
+            System.out.println(matrix.size());
+            System.out.println(this.getHeight());
             throw new IllegalArgumentException();
         }
     }
@@ -47,7 +49,6 @@ public class Grid {
     @Override
     public Object clone() {
         ArrayList<ArrayList<Cell>> matrixClone = new ArrayList<ArrayList<Cell>>();
-        System.out.println("clonage");
         for (ArrayList<Cell> line : this.getMatrix() ){
             matrixClone.add(new ArrayList<Cell>());
             for(Cell cell : line){

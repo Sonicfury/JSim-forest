@@ -20,11 +20,13 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+
+import static java.lang.Integer.parseInt;
 
 public class Client extends Application implements PropertyChangeListener {
     public static double winWidth;
@@ -74,8 +76,6 @@ public class Client extends Application implements PropertyChangeListener {
     }
 
     private void changeGridSize(Pane gridRootPane, String width, String height){
-        simulationConfig.setGridWidth(parseInt(width));
-        simulationConfig.setGridHeight(parseInt(height));
         try{
             gridRootPane.getChildren().clear();
             this.generateGrid(gridRootPane);
@@ -192,8 +192,14 @@ public class Client extends Application implements PropertyChangeListener {
         // Générationd de la grille et rechargement de la grille
         generateGrid(gridPane);
         scrollPane.setContent(gridPane);
-        gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText()));
-        gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText()));
+        gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> {
+            this.simulationConfig.setGridWidth(parseInt(gridWidthField.getText()));
+            changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
+        });
+        gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> {
+            this.simulationConfig.setGridHeight(parseInt(gridHeightField.getText()));
+            changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
+        });
 
         //Champ de nombre de pas
         Label simulationStepLabel = new Label("Nombre de pas : ");
@@ -272,6 +278,11 @@ public class Client extends Application implements PropertyChangeListener {
         resetSVG.setScaleY(0.1);
         resetSVG.setFill(Color.WHITE);
         resetButton.setOnMouseClicked((event -> {
+            gridHeightField.setDisable(false);
+            gridWidthField.setDisable(false);
+            simulationSpeedField.setDisable(false);
+            simulationStepField.setDisable(false);
+            System.out.println(this.simulationConfig.getGridHeight());
             this.simulation = new Simulation(this.simulationConfig);
             Collections.copy(this.simulation.getGrid().getMatrix(), this.initialState.getGrid().getMatrix());
             this.initialState = null;
@@ -305,9 +316,13 @@ public class Client extends Application implements PropertyChangeListener {
         stepForwardSVG.setFill(Color.WHITE);
         stepForward.getStyleClass().add("playButton");
         stepForward.setOnMouseClicked((event -> {
+            gridHeightField.setDisable(true);
+            gridWidthField.setDisable(true);
+            simulationSpeedField.setDisable(true);
+            simulationStepField.setDisable(true);
             if(this.initialState == null){
-                System.out.println("setting initial state");
                 this.initialState = new Simulation(this.simulationConfig);
+                System.out.println(this.simulationConfig.getGridHeight());
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
             }
             this.simulation.step();
@@ -316,7 +331,6 @@ public class Client extends Application implements PropertyChangeListener {
         controlButtons.getChildren().add(stepForward);
         rectDivConfig.getChildren().add(configButtons);
         rectDivConfig.getChildren().add(controlButtons);
-
         root.getChildren().add(rectDivConfig);
 
         // Rendering stage
@@ -324,5 +338,10 @@ public class Client extends Application implements PropertyChangeListener {
         stage.setScene(scene);
         stage.setTitle("Simulation JSIMForest");
         stage.show();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+
     }
 }
