@@ -198,6 +198,7 @@ public class Client extends Application implements PropertyChangeListener {
         scrollPane.setContent(gridPane);
         gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> {
             this.simulationConfig.setGridWidth(parseInt(gridWidthField.getText()));
+            this.simulation.newGrid();
             changeGridSize(gridPane, gridWidthField.getText(), gridHeightField.getText());
         });
         gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> {

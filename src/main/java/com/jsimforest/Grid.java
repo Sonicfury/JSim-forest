@@ -3,6 +3,7 @@ package com.jsimforest;
 import java.util.ArrayList;
 
 public class Grid {
+
     public Grid(int width, int height) {
         setWidth(width);
         setHeight(height);

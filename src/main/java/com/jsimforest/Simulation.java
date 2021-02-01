@@ -18,6 +18,10 @@ public class Simulation {
         this.stepObservable = new PCLStep();
     }
 
+    public void newGrid(){
+        this.grid = new Grid(this.configuration.getGridWidth(), this.configuration.getGridHeight());
+    };
+
     public Grid getGrid() {
 
         return this.grid;
