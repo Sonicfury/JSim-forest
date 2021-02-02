@@ -86,11 +86,7 @@ class SimulationTest extends AbstractTest {
 
         Grid copyGrid = copySimulation.getGrid();
 
-        try {
-            simulation.run();
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
+        simulation.run();
 
         assertEquals(stepsNumber, simulation.getStep());
         assertFalse(copyGrid.equals(simulation.getGrid()));
@@ -158,11 +154,7 @@ class SimulationTest extends AbstractTest {
 
         simulation.getGrid().setMatrix(matrix);
 
-        try {
-            simulation.run();
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
+        simulation.run();
 
         ArrayList<ArrayList<Cell>> simMatrix = simulation.getGrid().getMatrix();
         Cell simCell = simMatrix.get(1).get(1);
