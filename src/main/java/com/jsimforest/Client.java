@@ -450,12 +450,21 @@ public class Client extends Application implements PropertyChangeListener {
                 this.initialState = new Simulation(this.simulationConfig);
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
             }
-            if(this.step == 0 || this.simulation.isPause()){
+            if (this.step == 0 || this.simulation.isPause()) {
+                this.simulation.stepObservable.addPropertyChangeListener(this);
+                this.simulation.pause();
+                this.simulation.run();
                 this.simulation.step();
+                this.step++;
                 this.refreshGrid(this.gridPane);
-                if(!this.simulation.isPause()){
-                    System.out.println(pause);
+                if (!this.simulation.isPause()) {
                     this.simulation.pause();
+                }
+                if (this.step >= this.simulationConfig.getStepsNumber()) {
+                    gridHeightField.setDisable(false);
+                    gridWidthField.setDisable(false);
+                    simulationSpeedField.setDisable(false);
+                    simulationStepField.setDisable(false);
                 }
             }
 
