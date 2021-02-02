@@ -1,6 +1,10 @@
 package com.jsimforest;
 
-public class Configuration {
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+
+public class Configuration implements DataBaseInterface {
 
     private double stepsPerSecond;
     private int stepsNumber;
@@ -114,5 +118,27 @@ public class Configuration {
         } else {
             throw new IllegalArgumentException("The grid height must be at least 3");
         }
+    }
+
+    /**
+     *
+     * @throws SQLException sql exception
+     */
+
+    public void saveConfiguration(String name) throws SQLException {
+
+        String mode = "'" + this.mode.name() + "'";
+
+        String nameReformat =  "'" + name + "'";
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        String creationDate = "'" + format.format(new java.util.Date()) + "'" ;
+
+        String sql = MessageFormat.format(
+                "INSERT INTO Configurations (name, creationDate, execSpeed, stepNumber, gridWidth, gridHeight, configMode) VALUES ( {0}, {1}, {2}, {3}, {4}, {5}, {6} )",
+                nameReformat, creationDate, this.stepsPerSecond, this.stepsNumber, this.gridWidth, this.gridHeight, mode);
+
+        DataBaseInterface.insert(sql);
     }
 }

@@ -4,8 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -165,6 +168,15 @@ class SimulationTest extends AbstractTest {
         Cell simCell = simMatrix.get(1).get(1);
 
         assertTrue(simCell.getCellType().equals(treeType));
+    }
+    @Test
+    public void testSaveSimulation() {
+        String name = "Simulation name test";
+
+        Configuration config = new Configuration();
+        Simulation simu = new Simulation(config);
+
+        assertDoesNotThrow(()-> simu.saveSimulation(name, 1, 1));
     }
 
     private static ArrayList<ArrayList<Cell>> createMatrix() {

@@ -1,5 +1,7 @@
 package com.jsimforest;
 
+import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 public class Grid {
@@ -41,17 +43,15 @@ public class Grid {
             }
             this.matrix = matrix;
         }else{
-            System.out.println(matrix.size());
-            System.out.println(this.getHeight());
             throw new IllegalArgumentException();
         }
     }
 
     @Override
     public Object clone() {
-        ArrayList<ArrayList<Cell>> matrixClone = new ArrayList<ArrayList<Cell>>();
+        ArrayList<ArrayList<Cell>> matrixClone = new ArrayList<>();
         for (ArrayList<Cell> line : this.getMatrix() ){
-            matrixClone.add(new ArrayList<Cell>());
+            matrixClone.add(new ArrayList<>());
             for(Cell cell : line){
                 matrixClone.get(matrixClone.size() - 1).add(cell.clone());
             }
@@ -104,5 +104,17 @@ public class Grid {
         Cell cell = row.get(x);
 
         cell.setCellType(cellType);
+    }
+
+    /**
+     *
+     */
+    public void saveGrid() throws SQLException {
+        String sql = MessageFormat.format(
+                "INSERT INTO Grids (height, width) VALUES ( {0}, {1} )",
+                this.height, this.width );
+
+        DataBaseInterface.insert(sql);
+
     }
 }

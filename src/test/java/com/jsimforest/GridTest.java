@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -45,5 +47,13 @@ public class GridTest extends AbstractTest {
         newMatrix.add(new ArrayList<>(Arrays.asList(new Cell(1, 0), new Cell(1, 1))));
         gridTest.setMatrix(newMatrix);
         assertEquals(newMatrix, gridTest.getMatrix());
+    }
+
+    @Test
+    public void testSaveGrid() {
+
+        Grid grid = new Grid(10, 10);
+
+        assertDoesNotThrow(grid::saveGrid);
     }
 }
