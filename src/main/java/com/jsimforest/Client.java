@@ -354,9 +354,4 @@ public class Client extends Application implements PropertyChangeListener {
         stage.setTitle("Simulation JSIMForest");
         stage.show();
     }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-
-    }
 }

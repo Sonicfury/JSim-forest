@@ -1,0 +1,68 @@
+.mainHbox {
+  -fx-background-color: #2d3748;
+}
+
+.cell {
+  -fx-border-color: black;
+  -fx-border-width: 1px;
+}
+
+.null {
+  -fx-background-color: white;
+}
+
+.plant {
+  -fx-background-color: #94d050;
+}
+
+.youngTree {
+  -fx-background-color: #339933;
+}
+
+.tree {
+  -fx-background-color: #004800;
+}
+
+.scroller {
+  -fx-max-width: 1040;
+  -fx-min-width: 1040;
+  -fx-background: #2d3748;
+  -fx-border-color: #2d3748;
+}
+
+#configDiv {
+  -fx-background-color: #65a2b8;
+  -fx-min-width: 600;
+  -fx-min-height: 1020;
+  -fx-border-radius: 10 10 10 10;
+}
+#configDiv .buttonsGrid .button {
+  -fx-background-color: #2d3748;
+  -fx-font-size: 18;
+  -fx-max-width: 255;
+  -fx-min-width: 255;
+  -fx-text-fill: white;
+}
+#configDiv .buttonsGrid .button:hover {
+  -fx-text-fill: red;
+}
+#configDiv .controlButtons .playButton {
+  -fx-min-width: 104;
+  -fx-max-width: 104;
+  -fx-max-height: 104;
+  -fx-min-height: 104;
+  -fx-background-color: #2d3748;
+  -fx-background-radius: 52;
+}
+#configDiv .controlButtons .playButton:hover {
+  -fx-cursor: pointer;
+}
+#configDiv .configTitle {
+  -fx-font-size: 30;
+  -fx-text-alignment: center;
+}
+#configDiv .label {
+  -fx-font-size: 20;
+}
+
+/*# sourceMappingURL=sim.css.map */
