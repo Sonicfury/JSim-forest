@@ -13,8 +13,18 @@ import java.util.List;
 public class Simulation {
     private final Configuration configuration;
     private Grid grid;
+
+    public void setStep(int step) {
+        this.step = step;
+    }
+
     private int step;
     private int elapsedTime;
+
+    public boolean isPause() {
+        return pause;
+    }
+
     private boolean pause;
     public PCLStep stepObservable;
 
@@ -44,13 +54,13 @@ public class Simulation {
         return elapsedTime;
     }
 
-    /*public void pause(){
+    public void pause(){
         this.pause = true;
     }
 
     public void resume(){
         this.pause = false;
-    }*/
+    }
 
     public void run() {
         double stepsPerSecond = this.configuration.getStepsPerSecond();
