@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -34,6 +35,7 @@ public class Client extends Application implements PropertyChangeListener {
     public static double winWidth;
     public static double winHeight;
     private Pane gridPane = new Pane();
+    private Button activeButton;
 
     private int step;
 
@@ -51,7 +53,7 @@ public class Client extends Application implements PropertyChangeListener {
         refreshGrid(this.gridPane);
     }
 
-    public static void startUI(){
+    public static void startUI() {
         launch();
     }
 
@@ -61,42 +63,54 @@ public class Client extends Application implements PropertyChangeListener {
 
     PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
 
-    private void generateGrid(Pane gridRootPane){
-        for(int i = 0; i < this.simulationConfig.getGridWidth();i++){
-            for (int j = 0;j < this.simulationConfig.getGridHeight(); j++){
+    private void generateGrid(Pane gridRootPane) {
+        for (int i = 0; i < this.simulationConfig.getGridWidth(); i++) {
+            for (int j = 0; j < this.simulationConfig.getGridHeight(); j++) {
                 Pane newCell = new Pane();
-                newCell.setLayoutX(i*20);
-                newCell.setLayoutY(j*20);
+                newCell.setLayoutX(i * 20);
+                newCell.setLayoutY(j * 20);
                 newCell.setMinSize(20, 20);
                 newCell.getStyleClass().addAll(Arrays.asList("cell", "null"));
                 int yCoord = i;
                 int xCoord = j;
-                newCell.setOnMouseClicked(event -> {
-                    String actualState = newCell.getStyleClass().get(1);
-                    newCell.getStyleClass().remove(actualState);
-                    newCell.getStyleClass().add(this.cycleTypes(actualState, xCoord, yCoord));
+                newCell.setOnMouseClicked((event) -> {
+                    if (event.getButton().equals(MouseButton.PRIMARY)) {
+                        String actualState = newCell.getStyleClass().get(1);
+                        newCell.getStyleClass().remove(actualState);
+                        newCell.getStyleClass().add(this.cycleTypes(actualState, xCoord, yCoord));
+                    } else {
+                        // Changement de santé
+                    }
                 });
                 gridRootPane.getChildren().add(newCell);
             }
         }
     }
 
-    private void changeGridSize(Pane gridRootPane){
-        try{
+    private void changeGridSize(Pane gridRootPane) {
+        try {
             gridRootPane.getChildren().clear();
             this.generateGrid(gridRootPane);
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private void refreshGrid(Pane gridRootPane){
+    private void changeActiveMode(Button newButton) {
+        if (this.step == 0) {
+            this.activeButton.getStyleClass().remove("active");
+            newButton.getStyleClass().add("active");
+            this.activeButton = newButton;
+        }
+    }
+
+    private void refreshGrid(Pane gridRootPane) {
         gridRootPane.getChildren().clear();
-        for(int i = 0; i < this.simulationConfig.getGridHeight(); i++){
-            for(int j = 0; j < this.simulationConfig.getGridWidth(); j++){
+        for (int i = 0; i < this.simulationConfig.getGridHeight(); i++) {
+            for (int j = 0; j < this.simulationConfig.getGridWidth(); j++) {
                 Pane newCell = new Pane();
-                newCell.setLayoutX(i*20);
-                newCell.setLayoutY(j*20);
+                newCell.setLayoutX(i * 20);
+                newCell.setLayoutY(j * 20);
                 newCell.setMinSize(20, 20);
                 newCell.getStyleClass().addAll(Arrays.asList("cell", this.simulation.getGrid().getMatrix().get(i).get(j).getCellType().getName()));
                 gridRootPane.getChildren().add(newCell);
@@ -110,7 +124,7 @@ public class Client extends Application implements PropertyChangeListener {
         CellType plantType = new CellType("plant", "lightGreen");
         CellType youngTreeType = new CellType("youngTree", "mediumGreen");
         CellType treeType = new CellType("tree", "green");
-        switch (currentType){
+        switch (currentType) {
             case "null":
                 newType = "plant";
                 this.simulation.getGrid().editCell(x, y, plantType);
@@ -133,7 +147,7 @@ public class Client extends Application implements PropertyChangeListener {
         return newType;
     }
 
-    public void start(Stage stage){
+    public void start(Stage stage) {
         //Default config
         this.simulationConfig = new Configuration();
         this.simulation = new Simulation(simulationConfig);
@@ -198,7 +212,7 @@ public class Client extends Application implements PropertyChangeListener {
         generateGrid(this.gridPane);
         scrollPane.setContent(this.gridPane);
         gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue.equals("") && parseInt(newValue) >= 3){
+            if (!newValue.equals("") && parseInt(newValue) >= 3) {
                 pause.setOnFinished(event -> {
                     this.simulationConfig.setGridWidth(parseInt(newValue));
                     this.simulation.newGrid();
@@ -209,12 +223,12 @@ public class Client extends Application implements PropertyChangeListener {
 
         });
         gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue.equals("") && parseInt(newValue) >= 3)
-            pause.setOnFinished(event -> {
-                this.simulationConfig.setGridHeight(parseInt(newValue));
-                this.simulation.newGrid();
-                changeGridSize(this.gridPane);
-            });
+            if (!newValue.equals("") && parseInt(newValue) >= 3)
+                pause.setOnFinished(event -> {
+                    this.simulationConfig.setGridHeight(parseInt(newValue));
+                    this.simulation.newGrid();
+                    changeGridSize(this.gridPane);
+                });
             pause.playFromStart();
         });
 
@@ -227,7 +241,7 @@ public class Client extends Application implements PropertyChangeListener {
         simulationStepField.getStyleClass().add("field");
         formulary.add(simulationStepField, 1, 3);
         simulationStepField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue.equals("")){
+            if (!newValue.equals("")) {
                 this.simulationConfig.setStepsNumber(parseInt(newValue));
             }
         });
@@ -242,7 +256,7 @@ public class Client extends Application implements PropertyChangeListener {
         formulary.add(simulationSpeedField, 1, 4);
         rectDivConfig.getChildren().add(formulary);
         simulationSpeedField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue.equals("")){
+            if (!newValue.equals("")) {
                 this.simulationConfig.setStepsPerSecond(parseInt(newValue));
             }
         });
@@ -269,6 +283,64 @@ public class Client extends Application implements PropertyChangeListener {
         configButtons.add(exportGrid, 1, 0);
         configButtons.add(importGrid, 1, 1);
 
+        // Mode buttons
+        HBox simMode = new HBox();
+        simMode.setAlignment(Pos.CENTER);
+        simMode.getStyleClass().add("modeButtons");
+
+        SVGPath forestSVG = new SVGPath();
+        forestSVG.setContent("M378.31 378.49L298.42 288h30.63c9.01 0 16.98-5 20.78-13.06 3.8-8.04 2.55-17.26-3.28-24.05L268.42 160h28.89c9.1 0 17.3-5.35 20.86-13.61 3.52-8.13 1.86-17.59-4.24-24.08L203.66 4.83c-6.03-6.45-17.28-6.45-23.32 0L70.06 122.31c-6.1 6.49-7.75 15.95-4.24 24.08C69.38 154.65 77.59 160 86.69 160h28.89l-78.14 90.91c-5.81 6.78-7.06 15.99-3.27 24.04C37.97 283 45.93 288 54.95 288h30.63L5.69 378.49c-6 6.79-7.36 16.09-3.56 24.26 3.75 8.05 12 13.25 21.01 13.25H160v24.45l-30.29 48.4c-5.32 10.64 2.42 23.16 14.31 23.16h95.96c11.89 0 19.63-12.52 14.31-23.16L224 440.45V416h136.86c9.01 0 17.26-5.2 21.01-13.25 3.8-8.17 2.44-17.47-3.56-24.26z");
+        forestSVG.setScaleY(0.1);
+        forestSVG.setScaleX(0.1);
+        forestSVG.setFill(Color.GREEN);
+        Button forestModeButton = new Button("", forestSVG);
+        this.activeButton = forestModeButton;
+
+        forestModeButton.getStyleClass().add("modeButton");
+        forestModeButton.getStyleClass().add("active");
+        forestModeButton.setOnMouseClicked((event) -> {
+            if (this.activeButton != forestModeButton) {
+                changeActiveMode(forestModeButton);
+                this.activeButton = forestModeButton;
+            }
+        });
+        simMode.getChildren().add(forestModeButton);
+
+        SVGPath fireSVG = new SVGPath();
+        fireSVG.setContent("M192 0C79.7 101.3 0 220.9 0 300.5 0 425 79 512 192 512s192-87 192-211.5c0-79.9-80.2-199.6-192-300.5zm0 448c-56.5 0-96-39-96-94.8 0-13.5 4.6-61.5 96-161.2 91.4 99.7 96 147.7 96 161.2 0 55.8-39.5 94.8-96 94.8z");
+        fireSVG.setFill(Color.RED);
+        fireSVG.setScaleY(0.1);
+        fireSVG.setScaleX(0.1);
+        Button fireModeButton = new Button("", fireSVG);
+        fireModeButton.getStyleClass().add("modeButton");
+        fireModeButton.setOnMouseClicked((event) -> {
+            if (activeButton != fireModeButton) {
+                changeActiveMode(fireModeButton);
+                this.activeButton = fireModeButton;
+            }
+        });
+//        fireModeButton.setId("fireMode");
+
+        simMode.getChildren().add(fireModeButton);
+
+        SVGPath bugSVG = new SVGPath();
+        bugSVG.setContent("M511.988 288.9c-.478 17.43-15.217 31.1-32.653 31.1H424v16c0 21.864-4.882 42.584-13.6 61.145l60.228 60.228c12.496 12.497 12.496 32.758 0 45.255-12.498 12.497-32.759 12.496-45.256 0l-54.736-54.736C345.886 467.965 314.351 480 280 480V236c0-6.627-5.373-12-12-12h-24c-6.627 0-12 5.373-12 12v244c-34.351 0-65.886-12.035-90.636-32.108l-54.736 54.736c-12.498 12.497-32.759 12.496-45.256 0-12.496-12.497-12.496-32.758 0-45.255l60.228-60.228C92.882 378.584 88 357.864 88 336v-16H32.666C15.23 320 .491 306.33.013 288.9-.484 270.816 14.028 256 32 256h56v-58.745l-46.628-46.628c-12.496-12.497-12.496-32.758 0-45.255 12.498-12.497 32.758-12.497 45.256 0L141.255 160h229.489l54.627-54.627c12.498-12.497 32.758-12.497 45.256 0 12.496 12.497 12.496 32.758 0 45.255L424 197.255V256h56c17.972 0 32.484 14.816 31.988 32.9zM257 0c-61.856 0-112 50.144-112 112h224C369 50.144 318.856 0 257 0z");
+        bugSVG.setFill(Color.PURPLE);
+        bugSVG.setScaleY(0.1);
+        bugSVG.setScaleX(0.1);
+        Button bugModeButton = new Button("", bugSVG);
+        bugModeButton.setOnMouseClicked((event) -> {
+            if (activeButton != bugModeButton) {
+                changeActiveMode(bugModeButton);
+                this.activeButton = bugModeButton;
+            }
+        });
+        bugModeButton.getStyleClass().add("modeButton");
+        bugModeButton.setId("bugMode");
+        simMode.getChildren().add(bugModeButton);
+
+        formulary.add(simMode, 0, 5);
+
         //Simulation control
         HBox controlButtons = new HBox();
         controlButtons.setPadding(new Insets(400, 15, 0, 15));
@@ -283,9 +355,9 @@ public class Client extends Application implements PropertyChangeListener {
         playSVG.setScaleX(0.1);
         playSVG.setScaleY(0.1);
         playSVG.setFill(Color.WHITE);
-        playButton.getStyleClass().add("playButton");
+        playButton.getStyleClass().add("controlButton");
         playButton.setOnMouseClicked((event) -> {
-            if(!this.simulation.isPause() && this.simulation.getStep() == 0){
+            if (!this.simulation.isPause() && this.simulation.getStep() == 0) {
                 this.initialState = new Simulation(this.simulationConfig);
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
                 gridHeightField.setDisable(true);
@@ -294,7 +366,7 @@ public class Client extends Application implements PropertyChangeListener {
                 simulationStepField.setDisable(true);
                 this.simulation.stepObservable.addPropertyChangeListener(this);
                 simulation.run();
-            }else{
+            } else {
                 this.simulation.resume();
             }
 
@@ -308,7 +380,7 @@ public class Client extends Application implements PropertyChangeListener {
         pauseSVG.setScaleX(0.1);
         pauseSVG.setScaleY(0.1);
         pauseSVG.setFill(Color.WHITE);
-        pauseButton.getStyleClass().add("playButton");
+        pauseButton.getStyleClass().add("controlButton");
         controlButtons.getChildren().add(pauseButton);
         pauseButton.setOnMouseClicked((event) -> {
             this.simulation.pause();
@@ -322,7 +394,7 @@ public class Client extends Application implements PropertyChangeListener {
         resetSVG.setScaleY(0.1);
         resetSVG.setFill(Color.WHITE);
         resetButton.setOnMouseClicked((event -> {
-            if((this.getStep() == 0 || this.simulation.isPause()) && this.initialState != null){
+            if ((this.getStep() == 0 || this.simulation.isPause()) && this.initialState != null) {
                 gridHeightField.setDisable(false);
                 gridWidthField.setDisable(false);
                 simulationSpeedField.setDisable(false);
@@ -335,7 +407,7 @@ public class Client extends Application implements PropertyChangeListener {
             }
         }));
 
-        resetButton.getStyleClass().add("playButton");
+        resetButton.getStyleClass().add("controlButton");
         controlButtons.getChildren().add(resetButton);
 
         // clear button
@@ -345,7 +417,7 @@ public class Client extends Application implements PropertyChangeListener {
         clearSVG.setScaleX(0.1);
         clearSVG.setScaleY(0.1);
         clearButton.setOnMouseClicked((event -> {
-            if(this.step == 0 || this.simulation.isPause()){
+            if (this.step == 0 || this.simulation.isPause()) {
                 this.simulation = new Simulation(this.simulationConfig);
                 gridHeightField.setDisable(false);
                 gridWidthField.setDisable(false);
@@ -357,7 +429,7 @@ public class Client extends Application implements PropertyChangeListener {
             }
         }));
         clearSVG.setFill(Color.WHITE);
-        clearButton.getStyleClass().add("playButton");
+        clearButton.getStyleClass().add("controlButton");
 
         controlButtons.getChildren().add(clearButton);
 
@@ -368,13 +440,13 @@ public class Client extends Application implements PropertyChangeListener {
         stepForwardSVG.setScaleX(0.1);
         stepForwardSVG.setScaleY(0.1);
         stepForwardSVG.setFill(Color.WHITE);
-        stepForward.getStyleClass().add("playButton");
+        stepForward.getStyleClass().add("controlButton");
         stepForward.setOnMouseClicked((event -> {
             gridHeightField.setDisable(true);
             gridWidthField.setDisable(true);
             simulationSpeedField.setDisable(true);
             simulationStepField.setDisable(true);
-            if(this.step == 0){
+            if (this.step == 0) {
                 this.initialState = new Simulation(this.simulationConfig);
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
             }
