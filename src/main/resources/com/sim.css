@@ -46,7 +46,16 @@
 #configDiv .buttonsGrid .button:hover {
   -fx-text-fill: red;
 }
-#configDiv .controlButtons .playButton {
+#configDiv .modeButtons .modeButton {
+  -fx-min-width: 104;
+  -fx-max-width: 104;
+  -fx-max-height: 104;
+  -fx-min-height: 104;
+}
+#configDiv .modeButtons .modeButton.active {
+  -fx-background-color: #2d3748;
+}
+#configDiv .controlButtons .controlButton {
   -fx-min-width: 104;
   -fx-max-width: 104;
   -fx-max-height: 104;
@@ -54,7 +63,7 @@
   -fx-background-color: #2d3748;
   -fx-background-radius: 52;
 }
-#configDiv .controlButtons .playButton:hover {
+#configDiv .controlButtons .controlButton:hover {
   -fx-cursor: pointer;
 }
 #configDiv .configTitle {
