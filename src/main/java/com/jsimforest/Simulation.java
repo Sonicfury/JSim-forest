@@ -5,6 +5,9 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import javafx.application.Platform;
+
+import java.util.*;
 import java.util.List;
 
 public class Simulation {
@@ -49,18 +52,24 @@ public class Simulation {
         this.pause = false;
     }*/
 
-    public void run() throws InterruptedException {
+    public void run() {
         double stepsPerSecond = this.configuration.getStepsPerSecond();
         int interval = (int) (1000 / stepsPerSecond);
-
-        while (this.step < this.configuration.getStepsNumber()) {
-            // this.step incremented in step()
-            if (!this.pause) {
-                this.step();
-                Thread.sleep(interval);
-                this.elapsedTime = this.step * interval;
+        new Thread(() -> {
+            while (this.step < this.configuration.getStepsNumber()) {
+                try {
+                    Thread.sleep(interval);
+                } catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+                Platform.runLater(() -> {
+                    if (!this.pause) {
+                        this.step(); // this.step incremented in step()
+                        this.elapsedTime = this.step * interval;
+                    }
+                });
             }
-        }
+        }).start();
     }
 
     public void step() {

@@ -33,6 +33,7 @@ import static java.lang.Integer.parseInt;
 public class Client extends Application implements PropertyChangeListener {
     public static double winWidth;
     public static double winHeight;
+    private Pane gridPane = new Pane();
 
     private int step;
 
@@ -47,6 +48,7 @@ public class Client extends Application implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         this.setStep((int) evt.getNewValue());
+        refreshGrid(this.gridPane);
     }
 
     public static void startUI(){
@@ -79,7 +81,7 @@ public class Client extends Application implements PropertyChangeListener {
         }
     }
 
-    private void changeGridSize(Pane gridRootPane, String width, String height){
+    private void changeGridSize(Pane gridRootPane){
         try{
             gridRootPane.getChildren().clear();
             this.generateGrid(gridRootPane);
@@ -156,8 +158,7 @@ public class Client extends Application implements PropertyChangeListener {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.getStyleClass().add("scroller");
         root.getChildren().add(scrollPane);
-        Pane gridPane = new Pane();
-        gridPane.getStyleClass().add("gridPane");
+        this.gridPane.getStyleClass().add("gridPane");
 
 
         //Config interface
@@ -193,26 +194,26 @@ public class Client extends Application implements PropertyChangeListener {
         gridHeightField.setText("100");
         formulary.add(gridHeightField, 1, 2);
 
-        // Générationd de la grille et rechargement de la grille
-        generateGrid(gridPane);
-        scrollPane.setContent(gridPane);
+        // Génération de la grille et rechargement de la grille
+        generateGrid(this.gridPane);
+        scrollPane.setContent(this.gridPane);
         gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(parseInt(newValue) > 3){
+            if(!newValue.equals("") && parseInt(newValue) > 3){
                 pause.setOnFinished(event -> {
                     this.simulationConfig.setGridWidth(parseInt(newValue));
                     this.simulation.newGrid();
-                    changeGridSize(gridPane, newValue, gridHeightField.getText());
+                    changeGridSize(this.gridPane);
                 });
                 pause.playFromStart();
             }
 
         });
         gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(parseInt(newValue) > 3)
+            if(!newValue.equals("") && parseInt(newValue) > 3)
             pause.setOnFinished(event -> {
                 this.simulationConfig.setGridHeight(parseInt(newValue));
                 this.simulation.newGrid();
-                changeGridSize(gridPane, gridWidthField.getText(), newValue);
+                changeGridSize(this.gridPane);
             });
             pause.playFromStart();
         });
@@ -225,6 +226,11 @@ public class Client extends Application implements PropertyChangeListener {
         simulationStepField.setText("20");
         simulationStepField.getStyleClass().add("field");
         formulary.add(simulationStepField, 1, 3);
+        simulationStepField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue.equals("")){
+                this.simulationConfig.setStepsNumber(parseInt(newValue));
+            }
+        });
 
         //Champ de la vitesse d'éxécution
         Label simulationSpeedLabel = new Label("Vitesse d'éxecution de la grille : ");
@@ -235,6 +241,12 @@ public class Client extends Application implements PropertyChangeListener {
         simulationSpeedField.getStyleClass().add("field");
         formulary.add(simulationSpeedField, 1, 4);
         rectDivConfig.getChildren().add(formulary);
+        simulationSpeedField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue.equals("")){
+                this.simulationConfig.setStepsPerSecond(parseInt(newValue));
+            }
+        });
+
 
         // Boutons configuration
         GridPane configButtons = new GridPane();
@@ -273,6 +285,10 @@ public class Client extends Application implements PropertyChangeListener {
         playSVG.setScaleY(0.1);
         playSVG.setFill(Color.WHITE);
         playButton.getStyleClass().add("playButton");
+        playButton.setOnMouseClicked((event) -> {
+            this.simulation.stepObservable.addPropertyChangeListener(this);
+            simulation.run();
+        });
         controlButtons.getChildren().add(playButton);
 
         // Pause button
@@ -300,7 +316,7 @@ public class Client extends Application implements PropertyChangeListener {
             this.simulation = new Simulation(this.simulationConfig);
             Collections.copy(this.simulation.getGrid().getMatrix(), this.initialState.getGrid().getMatrix());
             this.initialState = null;
-            refreshGrid(gridPane);
+            refreshGrid(this.gridPane);
         }));
 
         resetButton.getStyleClass().add("playButton");
@@ -314,7 +330,7 @@ public class Client extends Application implements PropertyChangeListener {
         clearSVG.setScaleY(0.1);
         clearButton.setOnMouseClicked((event -> {
             this.simulation = new Simulation(this.simulationConfig);
-            generateGrid(gridPane);
+            generateGrid(this.gridPane);
         }));
         clearSVG.setFill(Color.WHITE);
         clearButton.getStyleClass().add("playButton");
@@ -339,7 +355,7 @@ public class Client extends Application implements PropertyChangeListener {
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
             }
             this.simulation.step();
-            this.refreshGrid(gridPane);
+            this.refreshGrid(this.gridPane);
         }));
         controlButtons.getChildren().add(stepForward);
         rectDivConfig.getChildren().add(configButtons);
