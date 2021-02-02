@@ -57,8 +57,21 @@ $tree: hsl(120, 100%, 14.1%);
         }
     }
 
+    .modeButtons{
+        .modeButton{
+            -fx-min-width: 104;
+            -fx-max-width: 104;
+            -fx-max-height: 104;
+            -fx-min-height: 104;
+
+            &.active{
+                -fx-background-color: hsl(218,23.1%,22.9%);
+            }
+        }
+    }
+
     .controlButtons{
-        .playButton{
+        .controlButton{
             -fx-min-width: 104;
             -fx-max-width: 104;
             -fx-max-height: 104;
