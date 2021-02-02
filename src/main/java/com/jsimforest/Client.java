@@ -55,8 +55,8 @@ public class Client extends Application implements PropertyChangeListener {
         launch();
     }
 
-    private Simulation simulation;
-    private Configuration simulationConfig;
+    private Configuration simulationConfig = new Configuration();
+    private Simulation simulation = new Simulation(this.simulationConfig);
     private Simulation initialState;
 
     PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
@@ -198,7 +198,7 @@ public class Client extends Application implements PropertyChangeListener {
         generateGrid(this.gridPane);
         scrollPane.setContent(this.gridPane);
         gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue.equals("") && parseInt(newValue) > 3){
+            if(!newValue.equals("") && parseInt(newValue) >= 3){
                 pause.setOnFinished(event -> {
                     this.simulationConfig.setGridWidth(parseInt(newValue));
                     this.simulation.newGrid();
@@ -209,7 +209,7 @@ public class Client extends Application implements PropertyChangeListener {
 
         });
         gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue.equals("") && parseInt(newValue) > 3)
+            if(!newValue.equals("") && parseInt(newValue) >= 3)
             pause.setOnFinished(event -> {
                 this.simulationConfig.setGridHeight(parseInt(newValue));
                 this.simulation.newGrid();
@@ -246,7 +246,6 @@ public class Client extends Application implements PropertyChangeListener {
                 this.simulationConfig.setStepsPerSecond(parseInt(newValue));
             }
         });
-
 
         // Boutons configuration
         GridPane configButtons = new GridPane();
@@ -286,8 +285,19 @@ public class Client extends Application implements PropertyChangeListener {
         playSVG.setFill(Color.WHITE);
         playButton.getStyleClass().add("playButton");
         playButton.setOnMouseClicked((event) -> {
-            this.simulation.stepObservable.addPropertyChangeListener(this);
-            simulation.run();
+            if(!this.simulation.isPause() && this.simulation.getStep() == 0){
+                this.initialState = new Simulation(this.simulationConfig);
+                this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
+                gridHeightField.setDisable(true);
+                gridWidthField.setDisable(true);
+                simulationSpeedField.setDisable(true);
+                simulationStepField.setDisable(true);
+                this.simulation.stepObservable.addPropertyChangeListener(this);
+                simulation.run();
+            }else{
+                this.simulation.resume();
+            }
+
         });
         controlButtons.getChildren().add(playButton);
 
@@ -300,6 +310,9 @@ public class Client extends Application implements PropertyChangeListener {
         pauseSVG.setFill(Color.WHITE);
         pauseButton.getStyleClass().add("playButton");
         controlButtons.getChildren().add(pauseButton);
+        pauseButton.setOnMouseClicked((event) -> {
+            this.simulation.pause();
+        });
 
         // reset button
         SVGPath resetSVG = new SVGPath();
@@ -309,14 +322,17 @@ public class Client extends Application implements PropertyChangeListener {
         resetSVG.setScaleY(0.1);
         resetSVG.setFill(Color.WHITE);
         resetButton.setOnMouseClicked((event -> {
-            gridHeightField.setDisable(false);
-            gridWidthField.setDisable(false);
-            simulationSpeedField.setDisable(false);
-            simulationStepField.setDisable(false);
-            this.simulation = new Simulation(this.simulationConfig);
-            Collections.copy(this.simulation.getGrid().getMatrix(), this.initialState.getGrid().getMatrix());
-            this.initialState = null;
-            refreshGrid(this.gridPane);
+            if((this.getStep() == 0 || this.simulation.isPause()) && this.initialState != null){
+                gridHeightField.setDisable(false);
+                gridWidthField.setDisable(false);
+                simulationSpeedField.setDisable(false);
+                simulationStepField.setDisable(false);
+                this.simulation = new Simulation(this.simulationConfig);
+                Collections.copy(this.simulation.getGrid().getMatrix(), this.initialState.getGrid().getMatrix());
+                refreshGrid(this.gridPane);
+                this.simulation.setStep(0);
+                this.step = 0;
+            }
         }));
 
         resetButton.getStyleClass().add("playButton");
@@ -329,8 +345,16 @@ public class Client extends Application implements PropertyChangeListener {
         clearSVG.setScaleX(0.1);
         clearSVG.setScaleY(0.1);
         clearButton.setOnMouseClicked((event -> {
-            this.simulation = new Simulation(this.simulationConfig);
-            generateGrid(this.gridPane);
+            if(this.step == 0 || this.simulation.isPause()){
+                this.simulation = new Simulation(this.simulationConfig);
+                gridHeightField.setDisable(false);
+                gridWidthField.setDisable(false);
+                simulationSpeedField.setDisable(false);
+                simulationStepField.setDisable(false);
+                this.simulation.setStep(0);
+                this.step = 0;
+                generateGrid(this.gridPane);
+            }
         }));
         clearSVG.setFill(Color.WHITE);
         clearButton.getStyleClass().add("playButton");
@@ -350,12 +374,20 @@ public class Client extends Application implements PropertyChangeListener {
             gridWidthField.setDisable(true);
             simulationSpeedField.setDisable(true);
             simulationStepField.setDisable(true);
-            if(this.initialState == null){
+            if(this.step == 0){
                 this.initialState = new Simulation(this.simulationConfig);
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
             }
-            this.simulation.step();
-            this.refreshGrid(this.gridPane);
+            if(this.step == 0 || this.simulation.isPause()){
+                this.simulation.step();
+                this.refreshGrid(this.gridPane);
+                if(!this.simulation.isPause()){
+                    System.out.println(pause);
+                    this.simulation.pause();
+                }
+            }
+
+
         }));
         controlButtons.getChildren().add(stepForward);
         rectDivConfig.getChildren().add(configButtons);
