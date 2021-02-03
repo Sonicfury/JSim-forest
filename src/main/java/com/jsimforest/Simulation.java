@@ -86,6 +86,7 @@ public class Simulation {
                         }
                     });
                 }
+                this.pause = true;
             }).start();
         } else {
             while (this.step < this.configuration.getStepsNumber()) {
@@ -258,7 +259,6 @@ public class Simulation {
                 checkCentralCellForEvolution(centralCell, cellTypesList, cellHealthList, toReset, toAsh, toBurning, toInfected, toPlant, toYoungTree, toTree);
             }
         }
-        System.out.println(toBurning);
         evolveCells(toReset, toAsh, toBurning, toInfected, toPlant, toYoungTree, toTree);
 
         this.step += 1;
