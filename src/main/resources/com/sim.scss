@@ -3,6 +3,9 @@ $null: hsl(0,0%,100%);
 $plant: hsl(88, 57.7%, 56.5%);
 $yougTree: hsl(120, 50%, 40%);
 $tree: hsl(120, 100%, 14.1%);
+$infected: hsl(274, 53.8%, 40.8%);
+$fire: hsl(0, 100%, 50%);
+$ash: hsl(0, 0%, 50.2%);
 
 .mainHbox{
     -fx-background-color: $background;
@@ -27,6 +30,18 @@ $tree: hsl(120, 100%, 14.1%);
 
 .tree{
     -fx-background-color: $tree;
+}
+
+.infected{
+    -fx-background-color: $infected;
+}
+
+.ash{
+    -fx-background-color: $ash;
+}
+
+.burned{
+    -fx-background-color: $fire;
 }
 
 .scroller{
