@@ -6,15 +6,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
@@ -25,6 +19,7 @@ import javafx.util.Duration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -321,7 +316,53 @@ public class Client extends Application implements PropertyChangeListener {
         configButtons.setVgap(20);
         configButtons.setHgap(20);
 
+        BorderPane popupRoot = new BorderPane();
+        Stage popupStage = new Stage();
+        Scene popupScene = new Scene(popupRoot, 750, 50);
+        HBox askConfigNameBox = new HBox(50);
+
+        TextField askConfigName = new TextField();
+        askConfigName.setMinWidth(250);
+
+        Label askConfigNameLabel = new Label("Entrez un nom pour votre nouvelle configuration : ");
+        askConfigNameLabel.setMinWidth(300);
+        askConfigNameLabel.setLabelFor(askConfigName);
+        askConfigNameLabel.setId("popupLabel");
+
+        Button submitConfigName = new Button("Confirmer");
+        submitConfigName.setMinWidth(100);
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle("Erreur");
+        error.setHeaderText("");
+        error.setContentText("Une erreur est survenue pendant l'envoi de la configuration");
+        Alert successful = new Alert(Alert.AlertType.INFORMATION);
+        successful.setTitle("Succés");
+        successful.setHeaderText("");
+        successful.setContentText("Votre configuration est sauvegardée");
+        submitConfigName.setOnMouseClicked((event) -> {
+            if(!askConfigName.getText().equals("")){
+                try {
+                    this.simulationConfig.saveConfiguration(askConfigName.getText());
+                    popupStage.close();
+                    successful.show();
+                } catch (SQLException throwables) {
+                    error.show();
+                }
+            }
+        });
+
+        askConfigNameBox.getChildren().addAll(Arrays.asList(askConfigNameLabel, askConfigName, submitConfigName));
+        popupRoot.getChildren().add(askConfigNameBox);
+
+        popupStage.setScene(popupScene);
+        popupStage.setTitle("Nouvelle configuration");
+
         Button saveConfig = new Button("Sauvegarder configuration");
+        saveConfig.setOnMouseClicked((event) ->{
+            popupStage.show();
+
+        });
+
         saveConfig.getStyleClass().add("button");
         Button loadConfig = new Button("Charger configuration");
         loadConfig.getStyleClass().add("button");
