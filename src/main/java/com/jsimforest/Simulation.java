@@ -14,6 +14,7 @@ import java.util.List;
 public class Simulation {
     private final Configuration configuration;
     private Grid grid;
+
     private int step;
     private int elapsedTime;
 
