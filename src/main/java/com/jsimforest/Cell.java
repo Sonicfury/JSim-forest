@@ -41,6 +41,20 @@ public class Cell {
         this.health = Health.ok;
     }
 
+    /**
+     *
+     * @param cellType type of Cell
+     * @param health health of cell
+     * @param coordX coordinate of cell on the axe X
+     * @param coordY coordinate of cell on the axe Y
+     */
+    public Cell(CellType cellType, Health health, int coordX, int coordY) {
+        this.cellType = cellType;
+        this.coordX = coordX;
+        this.coordY = coordY;
+        this.health = health;
+    }
+
     public CellType getCellType() {
 
         return cellType;
@@ -140,5 +154,57 @@ public class Cell {
         DataBaseInterface.insert(sql);
     }
 
+    public void setFire(){
+        int randInt = (int) (Math.random() * 100);
 
+        switch (this.cellType.getName()){
+            case "plant":
+                if (randInt <= 25){
+                    this.setHealth(Health.burned);
+                }
+                break;
+            case "youngTree":
+                if (randInt <= 50){
+                    this.setHealth(Health.burned);
+                }
+                break;
+            case "tree":
+                if (randInt <= 75){
+                    this.setHealth(Health.burned);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void infect(){
+        int randInt = (int) (Math.random() * 100);
+
+        switch (this.cellType.getName()){
+            case "plant":
+                if (randInt <= 75){
+                    this.setHealth(Health.infected);
+                }
+                break;
+            case "youngTree":
+                if (randInt <= 50){
+                    this.setHealth(Health.infected);
+                }
+                break;
+            case "tree":
+                if (randInt <= 25){
+                    this.setHealth(Health.infected);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void reset(){
+        this.setCellType(new CellType());
+        this.setHealth(Health.ok);
+        this.setAge(0);
+    }
 }
