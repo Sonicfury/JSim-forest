@@ -32,8 +32,8 @@ import java.util.Collections;
 import static java.lang.Integer.parseInt;
 
 public class Client extends Application implements PropertyChangeListener {
-    public static double winWidth;
-    public static double winHeight;
+    private static double winWidth;
+    private static double winHeight;
     private Pane gridPane = new Pane();
     private Button activeButton;
 
@@ -60,6 +60,7 @@ public class Client extends Application implements PropertyChangeListener {
     private Configuration simulationConfig = new Configuration();
     private Simulation simulation = new Simulation(this.simulationConfig);
     private Simulation initialState;
+    private Mode simulationMode = Mode.forest;
 
     PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
 
@@ -70,16 +71,21 @@ public class Client extends Application implements PropertyChangeListener {
                 newCell.setLayoutX(i * 20);
                 newCell.setLayoutY(j * 20);
                 newCell.setMinSize(20, 20);
-                newCell.getStyleClass().addAll(Arrays.asList("cell", "null"));
+                newCell.getStyleClass().addAll(Arrays.asList("cell", "null", "ok"));
                 int yCoord = i;
                 int xCoord = j;
                 newCell.setOnMouseClicked((event) -> {
                     if (event.getButton().equals(MouseButton.PRIMARY)) {
                         String actualState = newCell.getStyleClass().get(1);
                         newCell.getStyleClass().remove(actualState);
-                        newCell.getStyleClass().add(this.cycleTypes(actualState, xCoord, yCoord));
+                        newCell.getStyleClass().add(1, this.cycleTypes(actualState, xCoord, yCoord));
+                        newCell.getStyleClass().set(2, "ok");
                     } else {
-                        // Changement de santé
+                        String currentHealth = newCell.getStyleClass().get(2);
+                        newCell.getStyleClass().remove(currentHealth);
+                        System.out.println(cycleHealth(Health.valueOf(currentHealth), xCoord, yCoord));
+                        System.out.println(currentHealth);
+                        newCell.getStyleClass().add(2, cycleHealth(Health.valueOf(currentHealth), xCoord, yCoord));
                     }
                 });
                 gridRootPane.getChildren().add(newCell);
@@ -127,24 +133,59 @@ public class Client extends Application implements PropertyChangeListener {
         switch (currentType) {
             case "null":
                 newType = "plant";
-                this.simulation.getGrid().editCell(x, y, plantType);
+                this.simulation.getGrid().editCellType(x, y, plantType);
                 break;
             case "plant":
                 newType = "youngTree";
-                this.simulation.getGrid().editCell(x, y, youngTreeType);
+                this.simulation.getGrid().editCellType(x, y, youngTreeType);
                 break;
             case "youngTree":
                 newType = "tree";
-                this.simulation.getGrid().editCell(x, y, treeType);
+                this.simulation.getGrid().editCellType(x, y, treeType);
                 break;
             case "tree":
                 newType = "null";
-                this.simulation.getGrid().editCell(x, y, nullType);
+                this.simulation.getGrid().editCellType(x, y, nullType);
                 break;
             default:
                 throw new IllegalArgumentException();
         }
         return newType;
+    }
+
+    public String cycleHealth(Health currentHealth, int x, int y) {
+        Health newHealth;
+        if (this.simulationMode.equals(Mode.fire)) {
+            switch (currentHealth) {
+                case ok -> {
+                    this.simulation.getGrid().editCellHealth(x, y, Health.burned);
+                    newHealth = Health.burned;
+                }
+                case burned -> {
+                    this.simulation.getGrid().editCellHealth(x, y, Health.ash);
+                    newHealth = Health.ash;
+                }
+                case ash -> {
+                    this.simulation.getGrid().editCellHealth(x, y, Health.ok);
+                    newHealth = Health.ok;
+                }
+                default -> {
+                    newHealth = Health.ok;
+                }
+
+            }
+        } else if (this.simulationMode.equals(Mode.insect)) {
+            if (currentHealth.equals(Health.ok)) {
+                this.simulation.getGrid().editCellHealth(x, y, Health.infected);
+                newHealth = Health.infected;
+            }else{
+                this.simulation.getGrid().editCellHealth(x, y, Health.ok);
+                newHealth = Health.ok;
+            }
+        } else{
+            newHealth = currentHealth;
+        }
+        return newHealth.name();
     }
 
     public void start(Stage stage) {
@@ -302,6 +343,8 @@ public class Client extends Application implements PropertyChangeListener {
             if (this.activeButton != forestModeButton) {
                 changeActiveMode(forestModeButton);
                 this.activeButton = forestModeButton;
+                this.simulationMode = Mode.forest;
+                this.generateGrid(this.gridPane);
             }
         });
         simMode.getChildren().add(forestModeButton);
@@ -317,6 +360,8 @@ public class Client extends Application implements PropertyChangeListener {
             if (activeButton != fireModeButton) {
                 changeActiveMode(fireModeButton);
                 this.activeButton = fireModeButton;
+                this.simulationMode = Mode.fire;
+                this.generateGrid(this.gridPane);
             }
         });
 //        fireModeButton.setId("fireMode");
@@ -333,6 +378,8 @@ public class Client extends Application implements PropertyChangeListener {
             if (activeButton != bugModeButton) {
                 changeActiveMode(bugModeButton);
                 this.activeButton = bugModeButton;
+                this.simulationMode = Mode.insect;
+                this.generateGrid(this.gridPane);
             }
         });
         bugModeButton.getStyleClass().add("modeButton");
@@ -343,7 +390,7 @@ public class Client extends Application implements PropertyChangeListener {
 
         //Simulation control
         HBox controlButtons = new HBox();
-        controlButtons.setPadding(new Insets(400, 15, 0, 15));
+        controlButtons.setPadding(new Insets(300, 15, 0, 15));
         controlButtons.getStyleClass().add("controlButtons");
         controlButtons.setAlignment(Pos.CENTER);
         controlButtons.setSpacing(15);
