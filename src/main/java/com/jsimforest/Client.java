@@ -115,6 +115,23 @@ public class Client extends Application implements PropertyChangeListener {
                 newCell.setMinSize(20, 20);
                 newCell.getStyleClass().addAll(Arrays.asList("cell", this.simulation.getGrid().getMatrix().get(i).get(j).getCellType().getName(), this.simulation.getGrid().getMatrix().get(i).get(j).getHealth().name()));
                 gridRootPane.getChildren().add(newCell);
+                int yCoord = i;
+                int xCoord = j;
+                newCell.setOnMouseClicked((event) -> {
+                    if(this.simulation.isPause()){
+                        if (event.getButton().equals(MouseButton.PRIMARY)) {
+                            String actualState = newCell.getStyleClass().get(1);
+                            newCell.getStyleClass().remove(actualState);
+                            newCell.getStyleClass().add(1, this.cycleTypes(actualState, xCoord, yCoord));
+                            newCell.getStyleClass().set(2, "ok");
+                        } else {
+                            String currentHealth = newCell.getStyleClass().get(2);
+                            newCell.getStyleClass().remove(currentHealth);
+                            newCell.getStyleClass().add(2, cycleHealth(Health.valueOf(currentHealth), xCoord, yCoord));
+                        }
+                    }
+
+                });
             }
         }
     }
@@ -334,7 +351,7 @@ public class Client extends Application implements PropertyChangeListener {
         forestModeButton.getStyleClass().add("modeButton");
         forestModeButton.getStyleClass().add("active");
         forestModeButton.setOnMouseClicked((event) -> {
-            if (this.activeButton != forestModeButton) {
+            if (this.activeButton != forestModeButton && this.simulation.getStep() == 0) {
                 changeActiveMode(forestModeButton);
                 this.activeButton = forestModeButton;
                 this.simulationConfig.setMode(Mode.forest);
@@ -351,7 +368,7 @@ public class Client extends Application implements PropertyChangeListener {
         Button fireModeButton = new Button("", fireSVG);
         fireModeButton.getStyleClass().add("modeButton");
         fireModeButton.setOnMouseClicked((event) -> {
-            if (activeButton != fireModeButton) {
+            if (this.activeButton != fireModeButton && this.simulation.getStep() == 0) {
                 changeActiveMode(fireModeButton);
                 this.activeButton = fireModeButton;
                 this.simulationConfig.setMode(Mode.fire);
@@ -369,7 +386,7 @@ public class Client extends Application implements PropertyChangeListener {
         bugSVG.setScaleX(0.1);
         Button bugModeButton = new Button("", bugSVG);
         bugModeButton.setOnMouseClicked((event) -> {
-            if (activeButton != bugModeButton) {
+            if (this.activeButton != bugModeButton && this.simulation.getStep() == 0) {
                 changeActiveMode(bugModeButton);
                 this.activeButton = bugModeButton;
                 this.simulationConfig.setMode(Mode.insect);
@@ -412,6 +429,13 @@ public class Client extends Application implements PropertyChangeListener {
                 simulation.run();
             } else {
                 this.simulation.resume();
+            }
+            if (this.simulation.getStep() == (this.simulationConfig.getStepsNumber())) {
+                this.simulation.setStep(0);
+                simulation.run();
+            }else{
+                System.out.println(this.simulation.getStep());
+                System.out.println(this.simulationConfig.getStepsNumber());
             }
 
         });
