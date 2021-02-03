@@ -23,6 +23,18 @@
   -fx-background-color: #004800;
 }
 
+.infected {
+  -fx-background-color: #7030a0;
+}
+
+.ash {
+  -fx-background-color: gray;
+}
+
+.burned {
+  -fx-background-color: red;
+}
+
 .scroller {
   -fx-max-width: 1040;
   -fx-min-width: 1040;

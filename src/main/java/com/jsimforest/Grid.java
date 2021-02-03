@@ -99,11 +99,18 @@ public class Grid {
      * @param y cell's y coordinate
      * @param cellType cell's cellType
      */
-    public void editCell(int x, int y, CellType cellType){
+    public void editCellType(int x, int y, CellType cellType){
         ArrayList<Cell> row = this.getMatrix().get(y);
         Cell cell = row.get(x);
 
         cell.setCellType(cellType);
+    }
+
+    public void editCellHealth(int x, int y, Health health){
+        ArrayList<Cell> row = this.getMatrix().get(y);
+        Cell cell = row.get(x);
+
+        cell.setHealth(health);
     }
 
     /**
