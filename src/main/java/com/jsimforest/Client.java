@@ -357,6 +357,9 @@ public class Client extends Application implements PropertyChangeListener {
         playSVG.setFill(Color.WHITE);
         playButton.getStyleClass().add("controlButton");
         playButton.setOnMouseClicked((event) -> {
+            if (this.simulation.getStep() == (this.simulationConfig.getStepsNumber() + 1)) {
+                this.simulation.setStep(0);
+            }
             if (!this.simulation.isPause() && this.simulation.getStep() == 0) {
                 this.initialState = new Simulation(this.simulationConfig);
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
