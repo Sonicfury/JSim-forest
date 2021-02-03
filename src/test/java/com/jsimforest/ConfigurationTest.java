@@ -5,8 +5,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -97,6 +101,79 @@ class ConfigurationTest extends AbstractTest {
         String name = "test sauvegarde configuration";
 
         assertDoesNotThrow(()-> config.saveConfiguration(name));
+
+    }
+
+    @Test
+    public void testSelectOneConfiguration() throws SQLException {
+
+        Configuration config = new Configuration();
+
+        int id = 1;
+
+        ResultSet result = config.selectOneConfiguration(id);
+
+        String name = null;
+        int exectSpeed = 0;
+        int stepNumber = 0;
+        int gridWith = 0;
+        int gridHeight = 0;
+
+        while(result.next()) {
+
+            name = result.getString("name");
+            exectSpeed = result.getInt("execSpeed");
+            stepNumber = result.getInt("stepNumber");
+            gridWith = result.getInt("gridWidth");
+            gridHeight = result.getInt("gridHeight");
+        }
+
+        assertEquals("test sauvegarde",  name);
+        assertEquals(1,  exectSpeed);
+        assertEquals(10,  stepNumber);
+        assertEquals(100,  gridWith);
+        assertEquals(100,  gridHeight);
+
+
+    }
+
+    @Test
+    public void testSelectAllConfigurations() throws SQLException {
+
+        Configuration config = new Configuration();
+
+        ResultSet rs = config.selectAllConfigurations();
+
+        // collect column names
+        List<String> columnNames = new ArrayList<>();
+        ResultSetMetaData rsmd = rs.getMetaData();
+        for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+            columnNames.add(rsmd.getColumnLabel(i));
+        }
+
+        int rowIndex = 0;
+        while (rs.next()) {
+            rowIndex++;
+            // collect row data as objects in a List
+            List<Object> rowData = new ArrayList<>();
+            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                rowData.add(rs.getObject(i));
+            }
+            // for test purposes, dump contents to check our results
+            // (the real code would pass the "rowData" List to some other routine)
+            System.out.printf("Row %d%n", rowIndex);
+            for (int colIndex = 0; colIndex < rsmd.getColumnCount(); colIndex++) {
+                String objType = "null";
+                String objString = "";
+                Object columnObject = rowData.get(colIndex);
+                if (columnObject != null) {
+                    objString = columnObject.toString() + " ";
+                    objType = columnObject.getClass().getName();
+                }
+                System.out.printf("  %s: %s(%s)%n",
+                        columnNames.get(colIndex), objString, objType);
+            }
+        }
 
     }
 }
