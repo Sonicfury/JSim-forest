@@ -1,5 +1,6 @@
 package com.jsimforest;
 
+import java.sql.ResultSet;
 import javafx.application.Platform;
 
 import java.sql.SQLException;
@@ -13,11 +14,6 @@ import java.util.List;
 public class Simulation {
     private final Configuration configuration;
     private Grid grid;
-
-    public void setStep(int step) {
-        this.step = step;
-    }
-
     private int step;
     private int elapsedTime;
 
@@ -303,5 +299,19 @@ public class Simulation {
         public List<Health> getCellHealthList() {
             return cellHealthList;
         }
+    }
+
+    public ResultSet selectOneSimulatiuon(int id) throws  SQLException {
+
+        String sql = MessageFormat.format("SELECT * FROM configurations WHERE id = {0}", id);
+
+        return DataBaseInterface.select(sql);
+    }
+
+    public ResultSet selectAllSimulations() throws  SQLException {
+
+        String sql = "SELECT * FROM configurations ";
+
+        return DataBaseInterface.select(sql);
     }
 }

@@ -1,5 +1,6 @@
 package com.jsimforest;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -140,5 +141,19 @@ public class Configuration implements DataBaseInterface {
                 nameReformat, creationDate, this.stepsPerSecond, this.stepsNumber, this.gridWidth, this.gridHeight, mode);
 
         DataBaseInterface.insert(sql);
+    }
+
+    public ResultSet selectOneConfiguration(int id) throws  SQLException {
+
+        String sql = MessageFormat.format("SELECT * FROM configurations WHERE id = {0}", id);
+
+        return DataBaseInterface.select(sql);
+    }
+
+    public ResultSet selectAllConfigurations() throws  SQLException {
+
+        String sql = "SELECT * FROM configurations ";
+
+        return DataBaseInterface.select(sql);
     }
 }
