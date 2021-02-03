@@ -1,5 +1,5 @@
-$background : hsl(218,23.1%,22.9%);
-$null: hsl(0,0%,100%);
+$background: hsl(218, 23.1%, 22.9%);
+$null: hsl(0, 0%, 100%);
 $plant: hsl(88, 57.7%, 56.5%);
 $yougTree: hsl(120, 50%, 40%);
 $tree: hsl(120, 100%, 14.1%);
@@ -7,106 +7,106 @@ $infected: hsl(274, 53.8%, 40.8%);
 $fire: hsl(0, 100%, 50%);
 $ash: hsl(0, 0%, 50.2%);
 
-.mainHbox{
-    -fx-background-color: $background;
+.mainHbox {
+  -fx-background-color: $background;
 }
 
-.cell{
-    -fx-border-color: black;
-    -fx-border-width: 1px;
+.cell {
+  -fx-border-color: black;
+  -fx-border-width: 1px;
 }
 
-.null{
-    -fx-background-color: $null;
+.null {
+  -fx-background-color: $null;
 }
 
-.plant{
-    -fx-background-color: $plant;
+.plant {
+  -fx-background-color: $plant;
 }
 
-.youngTree{
-    -fx-background-color: $yougTree;
+.youngTree {
+  -fx-background-color: $yougTree;
 }
 
-.tree{
-    -fx-background-color: $tree;
+.tree {
+  -fx-background-color: $tree;
 }
 
-.infected{
-    -fx-background-color: $infected;
+.infected {
+  -fx-background-color: $infected;
 }
 
-.ash{
-    -fx-background-color: $ash;
+.ash {
+  -fx-background-color: $ash;
 }
 
-.burned{
-    -fx-background-color: $fire;
+.burned {
+  -fx-background-color: $fire;
 }
 
-.scroller{
-    -fx-max-width: 1040;
-    -fx-min-width: 1040;
-    -fx-background: $background;
-    -fx-border-color: $background;
+.scroller {
+  -fx-max-width: 1040;
+  -fx-min-width: 1040;
+  -fx-background: $background;
+  -fx-border-color: $background;
 }
 
 #configDiv {
-    -fx-background-color: hsl(196, 37%, 56%);
-    -fx-min-width: 600;
-    -fx-min-height: 1020;
-    -fx-border-radius: 10 10 10 10;
+  -fx-background-color: hsl(196, 37%, 56%);
+  -fx-min-width: 600;
+  -fx-min-height: 1020;
+  -fx-border-radius: 10 10 10 10;
 
-    .buttonsGrid{
+  .buttonsGrid {
 
-        .button{
-            -fx-background-color: $background;
-            -fx-font-size: 18;
-            -fx-max-width: 255;
-            -fx-min-width: 255;
-            -fx-text-fill: white;
+    .button {
+      -fx-background-color: $background;
+      -fx-font-size: 18;
+      -fx-max-width: 255;
+      -fx-min-width: 255;
+      -fx-text-fill: white;
 
-            &:hover{
-                -fx-text-fill: red;
-            }
-        }
+      &:hover {
+        -fx-text-fill: red;
+      }
     }
+  }
 
-    .modeButtons{
-        .modeButton{
-            -fx-min-width: 104;
-            -fx-max-width: 104;
-            -fx-max-height: 104;
-            -fx-min-height: 104;
+  .modeButtons {
+    .modeButton {
+      -fx-min-width: 104;
+      -fx-max-width: 104;
+      -fx-max-height: 104;
+      -fx-min-height: 104;
 
-            &.active{
-                -fx-background-color: hsl(218,23.1%,22.9%);
-            }
-        }
+      &.active {
+        -fx-background-color: hsl(218, 23.1%, 22.9%);
+      }
     }
+  }
 
-    .controlButtons{
-        .controlButton{
-            -fx-min-width: 104;
-            -fx-max-width: 104;
-            -fx-max-height: 104;
-            -fx-min-height: 104;
-            -fx-background-color: $background;
-            -fx-background-radius: 52;
+  .controlButtons {
+    .controlButton {
+      -fx-min-width: 104;
+      -fx-max-width: 104;
+      -fx-max-height: 104;
+      -fx-min-height: 104;
+      -fx-background-color: $background;
+      -fx-background-radius: 52;
 
-            &:hover{
-                -fx-cursor: pointer;
+      &:hover {
+        -fx-cursor: pointer;
 
-            }
-        }
+      }
     }
+  }
 
-    .configTitle{
-        -fx-font-size: 30;
-        -fx-text-alignment: center;
-    }
+  .configTitle {
+    -fx-font-size: 30;
+    -fx-text-alignment: center;
+  }
 
-    .label{
-        -fx-font-size: 20;
-    }
+  .label {
+    -fx-font-size: 20;
+  }
 }
