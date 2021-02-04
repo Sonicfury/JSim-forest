@@ -25,21 +25,21 @@ class SimulationTest extends AbstractTest {
         Simulation simulation = new Simulation(config);
         Grid grid = simulation.getGrid();
 
-        grid.editCellType(2, 3, plantType);
-        grid.editCellType(0, 2, plantType);
-        grid.editCellType(4, 1, plantType);
-        grid.editCellType(1, 1, plantType);
-        grid.editCellType(3, 1, plantType);
-        grid.editCellType(2, 0, youngTreeType);
-        grid.editCellType(4, 2, youngTreeType);
-        grid.editCellType(1, 0, youngTreeType);
-        grid.editCellType(3, 0, youngTreeType);
-        grid.editCellType(4, 3, youngTreeType);
-        grid.editCellType(4, 4, treeType);
-        grid.editCellType(0, 0, treeType);
-        grid.editCellType(1, 4, treeType);
-        grid.editCellType(3, 4, treeType);
-        grid.editCellType(3, 3, treeType);
+        grid.editCell(2, 3, plantType);
+        grid.editCell(0, 2, plantType);
+        grid.editCell(4, 1, plantType);
+        grid.editCell(1, 1, plantType);
+        grid.editCell(3, 1, plantType);
+        grid.editCell(2, 0, youngTreeType);
+        grid.editCell(4, 2, youngTreeType);
+        grid.editCell(1, 0, youngTreeType);
+        grid.editCell(3, 0, youngTreeType);
+        grid.editCell(4, 3, youngTreeType);
+        grid.editCell(4, 4, treeType);
+        grid.editCell(0, 0, treeType);
+        grid.editCell(1, 4, treeType);
+        grid.editCell(3, 4, treeType);
+        grid.editCell(3, 3, treeType);
 
         ArrayList<ArrayList<Cell>> expectedMatrix = createMatrix();
 

@@ -1,5 +1,6 @@
 package com.jsimforest;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -95,17 +96,23 @@ public class Grid {
      * @param y        cell's y coordinate
      * @param cellType cell's cellType
      */
-    public void editCellType(int x, int y, CellType cellType) {
+    public void editCell(int x, int y, CellType cellType) {
         ArrayList<Cell> row = this.getMatrix().get(y);
         Cell cell = row.get(x);
 
         cell.setCellType(cellType);
     }
 
-    public void editCellHealth(int x, int y, Health health) {
+    public void editCell(int x, int y, CellType cellType, Health health) {
         ArrayList<Cell> row = this.getMatrix().get(y);
         Cell cell = row.get(x);
+        cell.setCellType(cellType);
+        cell.setHealth(health);
+    }
 
+    public void editCell(int x, int y, Health health) {
+        ArrayList<Cell> row = this.getMatrix().get(y);
+        Cell cell = row.get(x);
         cell.setHealth(health);
     }
 
@@ -117,15 +124,15 @@ public class Grid {
                 "INSERT INTO Grids (height, width) VALUES ( {0}, {1} )",
                 this.height, this.width);
 
-        int gridId =  DataBaseInterface.insert(sql);
+        int gridId = DataBaseInterface.insert(sql);
         sql = "INSERT INTO Cells (coordX, coordY, health, id_Types, id_Grids) VALUES ";
         StringBuilder insertingValues = new StringBuilder();
         Cell currentCell;
         int idType;
-        for (int i = 0; i < this.getWidth(); i++){
-            for(int j = 0; j < this.getHeight(); j++){
+        for (int i = 0; i < this.getWidth(); i++) {
+            for (int j = 0; j < this.getHeight(); j++) {
                 currentCell = this.matrix.get(i).get(j);
-                switch(currentCell.getCellType().getName()){
+                switch (currentCell.getCellType().getName()) {
                     case "plant" -> {
                         idType = 2;
                     }
@@ -153,8 +160,13 @@ public class Grid {
                 ));
             }
         }
-//        System.out.println(sql + insertingValues.substring(0, insertingValues.length() - 2));
         DataBaseInterface.insert(sql + insertingValues.substring(0, insertingValues.length() - 2));
         return gridId;
+    }
+
+    public static ResultSet selectGridCells(int gridId) throws SQLException {
+
+        String sql = MessageFormat.format("SELECT coordX, coordY, health, t.name, t.color FROM cells c JOIN types t on c.id_Types = t.id WHERE id_Grids = {0} ORDER BY coordX ASC, coordY ASC", gridId);
+        return DataBaseInterface.select(sql);
     }
 }
