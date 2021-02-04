@@ -88,20 +88,21 @@ class SimulationTest extends AbstractTest {
         simulation.run();
 
         assertEquals(stepsNumber, simulation.getStep());
-        assertFalse(copyGrid.equals(simulation.getGrid()));
+        assertNotEquals(simulation.getGrid(), copyGrid);
         assertEquals(expectedElapsedTime, simulation.getElapsedTime());
     }
 
     @Test
     public void instantDensity_forest() {
+        Configuration config = new Configuration(1, 1, Mode.forest, 3, 3);
+        Simulation simulation = new Simulation(config);
+
         double expectedPlantDensity = (double) 1 / (double) 9;
         double expectedYoungTreeDensity = (double) 2 / (double) 9;
         double expectedTreeDensity = (double) 1 / (double) 9;
 
-        Density expectedDensity = new Density(expectedPlantDensity, expectedYoungTreeDensity, expectedTreeDensity);
+        Density expectedDensity = new Density(expectedPlantDensity, expectedYoungTreeDensity, expectedTreeDensity, simulation.getStep());
 
-        Configuration config = new Configuration(1, 1, Mode.forest, 3, 3);
-        Simulation simulation = new Simulation(config);
         ArrayList<ArrayList<Cell>> matrix = createLittleMatrix_fromNull_oneTreeTwoYoungTrees();
 
         simulation.getGrid().setMatrix(matrix);
@@ -113,28 +114,29 @@ class SimulationTest extends AbstractTest {
 
     @Test
     public void densities_forest() {
+        Configuration config = new Configuration(1, 3, Mode.forest, 3, 3);
+        Simulation simulation = new Simulation(config);
+
         double s1expectedPlantDensity = (double) 1 / (double) 9;
         double s1expectedYoungTreeDensity = (double) 2 / (double) 9;
         double s1expectedTreeDensity = (double) 1 / (double) 9;
-        Density s1Density = new Density(s1expectedPlantDensity, s1expectedYoungTreeDensity, s1expectedTreeDensity);
+        Density s1Density = new Density(s1expectedPlantDensity, s1expectedYoungTreeDensity, s1expectedTreeDensity, simulation.getStep());
 
         double s2expectedPlantDensity = (double) 0 / (double) 9;
         double s2expectedYoungTreeDensity = (double) 1 / (double) 9;
         double s2expectedTreeDensity = (double) 3 / (double) 9;
-        Density s2Density = new Density(s2expectedPlantDensity, s2expectedYoungTreeDensity, s2expectedTreeDensity);
+        Density s2Density = new Density(s2expectedPlantDensity, s2expectedYoungTreeDensity, s2expectedTreeDensity, simulation.getStep());
 
         double s3expectedPlantDensity = (double) 2 / (double) 9;
         double s3expectedYoungTreeDensity = (double) 1 / (double) 9;
         double s3expectedTreeDensity = (double) 3 / (double) 9;
-        Density s3Density = new Density(s3expectedPlantDensity, s3expectedYoungTreeDensity, s3expectedTreeDensity);
+        Density s3Density = new Density(s3expectedPlantDensity, s3expectedYoungTreeDensity, s3expectedTreeDensity, simulation.getStep());
 
         ArrayList<Density> expectedDensities = new ArrayList<>();
         expectedDensities.add(s1Density);
         expectedDensities.add(s2Density);
         expectedDensities.add(s3Density);
 
-        Configuration config = new Configuration(1, 3, Mode.forest, 3, 3);
-        Simulation simulation = new Simulation(config);
         ArrayList<ArrayList<Cell>> matrix = createLittleMatrix_fromNull_oneTreeTwoYoungTrees();
 
         simulation.getGrid().setMatrix(matrix);

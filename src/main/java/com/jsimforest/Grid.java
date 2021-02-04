@@ -146,7 +146,6 @@ public class Grid {
                         idType = 4;
                     }
                     default -> {
-                        System.out.println(currentCell.getCellType().getName());
                         throw new IllegalArgumentException("Le type fourni n'est pas correct");
                     }
                 }

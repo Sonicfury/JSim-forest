@@ -18,7 +18,7 @@ public class Simulation {
 
     private int step;
     private int elapsedTime;
-    private ArrayList<Density> densities = new ArrayList<>();
+    private final ArrayList<Density> densities = new ArrayList<>();
 
     public boolean isPause() {
         return pause;
@@ -377,7 +377,7 @@ public class Simulation {
         double infectedDensity = (double) infectedTotalCount / (double) cellsCount;
 
         this.densities.add(
-                new Density(plantDensity, youngTreeDensity, treeDensity, burningDensity, ashDensity, infectedDensity)
+                new Density(plantDensity, youngTreeDensity, treeDensity, burningDensity, ashDensity, infectedDensity, this.step)
         );
     }
 
