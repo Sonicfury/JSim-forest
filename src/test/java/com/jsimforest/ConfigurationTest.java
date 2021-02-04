@@ -128,7 +128,7 @@ class ConfigurationTest extends AbstractTest {
             gridHeight = result.getInt("gridHeight");
         }
 
-        assertEquals("test sauvegarde",  name);
+        assertEquals("test sauvegarde configuration",  name);
         assertEquals(1,  exectSpeed);
         assertEquals(10,  stepNumber);
         assertEquals(100,  gridWith);

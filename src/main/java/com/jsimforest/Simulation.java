@@ -302,16 +302,16 @@ public class Simulation {
         }
     }
 
-    public ResultSet selectOneSimulatiuon(int id) throws  SQLException {
+    public static ResultSet selectOneSimulation(int id) throws  SQLException {
 
-        String sql = MessageFormat.format("SELECT * FROM configurations WHERE id = {0}", id);
+        String sql = MessageFormat.format("SELECT s.id, c.id, id_Grids, s.name, steps, s.creationDate, execSpeed, stepNumber, gridWidth, gridHeight, configMode FROM simulations s JOIN configurations c on s.id_Configurations = c.id WHERE s.id = {0}", id);
 
         return DataBaseInterface.select(sql);
     }
 
-    public ResultSet selectAllSimulations() throws  SQLException {
+    public static ResultSet selectAllSimulations() throws  SQLException {
 
-        String sql = "SELECT * FROM configurations ";
+        String sql = "SELECT s.id, c.id, id_Grids, s.name, steps, s.creationDate, execSpeed, stepNumber, gridWidth, gridHeight, configMode FROM simulations s JOIN configurations c on s.id_Configurations = c.id";
 
         return DataBaseInterface.select(sql);
     }
