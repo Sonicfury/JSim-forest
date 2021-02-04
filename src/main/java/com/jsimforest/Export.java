@@ -2,12 +2,12 @@ package com.jsimforest;
 
 import com.opencsv.CSVWriter;
 
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
-
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -32,14 +32,20 @@ public class Export {
         return list;
     }
 
-    public static EventHandler<? super MouseEvent> export(Simulation simulation) throws IOException {
+    public static void export(Simulation simulation, String path) throws IOException {
 
         List<String[]> csvData = Export.createCsvDataSimple(simulation);
 
-        try (CSVWriter writer = new CSVWriter(new FileWriter("/Users/jbloup/Documents/Projects/Java/JSim-forest/test.csv"))) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyy-hhmmss");
+        String dateStr = simpleDateFormat.format(new Date());
+
+        try (CSVWriter writer = new CSVWriter(
+                new FileWriter(
+                        MessageFormat.format("{0}/{1}_{2}.csv",path,"JsimForest", dateStr)
+                )
+        )) {
             writer.writeAll(csvData);
         }
-        return null;
     }
 
 }

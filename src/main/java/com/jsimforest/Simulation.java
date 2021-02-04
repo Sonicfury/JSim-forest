@@ -18,7 +18,7 @@ public class Simulation {
 
     private int step;
     private int elapsedTime;
-    private final ArrayList<Density> densities = new ArrayList<>();
+    private ArrayList<Density> densities = new ArrayList<>();
 
     public boolean isPause() {
         return pause;
