@@ -53,6 +53,10 @@ public class Simulation {
         this.grid = new Grid(this.configuration.getGridWidth(), this.configuration.getGridHeight());
     }
 
+    public void resetDensities(){
+        this.densities = new ArrayList<>();
+    }
+
     public Grid getGrid() {
 
         return this.grid;

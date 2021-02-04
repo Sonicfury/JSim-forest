@@ -31,18 +31,21 @@ import java.util.*;
 import static java.lang.Integer.parseInt;
 
 public class Client extends Application implements PropertyChangeListener {
-    private ArrayList densities = new ArrayList(Arrays.asList(
-            new Text("Densité en arbre : 0"),
-                new Text("Densité en jeune pousse : 0"),
-                new Text("Densité en plante : 0"),
-                new Text("Densité en infecté : 0"),
-                new Text("Densité en brûlé : 0"),
-                new Text("Densité en cendre : 0")));
     private final Pane gridPane = new Pane();
     private ResultSet allSims;
     private Button activeButton;
     private boolean locker = false;
-    public VBox densitiesBox = new VBox(10);
+
+    VBox densitiesBox = new VBox(10);
+    ArrayList<Text> densities = new ArrayList<>(Arrays.asList(
+            new Text("Densité en arbres: "),
+            new Text("Densité en arbustes: "),
+            new Text("Densité en plantes: "),
+            new Text("Densité en végétaux infectés: "),
+            new Text("Densité en végétaux enflammés: "),
+            new Text("Densité en cendres: ")
+    ));
+
 
     public void setLocker(boolean locker) {
         this.locker = locker;
@@ -65,10 +68,10 @@ public class Client extends Application implements PropertyChangeListener {
     /**
      * Refresh the sims from the database
      */
-    public void refreshSims(){
-        try{
+    public void refreshSims() {
+        try {
             this.allSims = Simulation.selectAllSimulations();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -88,10 +91,9 @@ public class Client extends Application implements PropertyChangeListener {
      * This is executed at each step of the simulation
      */
     public void propertyChange(PropertyChangeEvent evt) {
-        refreshDensities();
         this.setStep((int) evt.getNewValue());
-        System.out.println("step");
         refreshGrid(this.gridPane);
+        refreshDensities();
     }
 
     public static void startUI() {
@@ -106,6 +108,7 @@ public class Client extends Application implements PropertyChangeListener {
 
     /**
      * generate a new grid in the gridroot pane
+     *
      * @param gridRootPane The grid root pane (pane that conatains the cell)
      */
     private void generateGrid(Pane gridRootPane) {
@@ -137,6 +140,7 @@ public class Client extends Application implements PropertyChangeListener {
 
     /**
      * Regenerate a fresh grid with new dimensions
+     *
      * @param gridRootPane The grid root pane (pane that conatains the cell)
      */
     private void changeGridSize(Pane gridRootPane) {
@@ -150,8 +154,9 @@ public class Client extends Application implements PropertyChangeListener {
 
     /**
      * Change the active mod for the config and the active skin for the button
+     *
      * @param newButton the new button to reskin
-     * @param newMode new mode for the simulation
+     * @param newMode   new mode for the simulation
      */
     private void changeActiveMode(Button newButton, Mode newMode) {
         if (this.step == 0) {
@@ -165,8 +170,8 @@ public class Client extends Application implements PropertyChangeListener {
     }
 
     public void healGrid() {
-        for(int i = 0; i < this.simulationConfig.getGridHeight(); i++){
-            for(int j = 0; j < this.simulationConfig.getGridWidth(); j++){
+        for (int i = 0; i < this.simulationConfig.getGridHeight(); i++) {
+            for (int j = 0; j < this.simulationConfig.getGridWidth(); j++) {
                 this.simulation.getGrid().getMatrix().get(i).get(j).setHealth(Health.ok);
             }
         }
@@ -175,22 +180,12 @@ public class Client extends Application implements PropertyChangeListener {
 
     /**
      * Refresh the grid of the GUI
+     *
      * @param gridRootPane The grid root pane (pane that conatains the cell)
      */
     private void refreshGrid(Pane gridRootPane) {
-        Density density = this.simulation.getDensities().get(this.step - 1);
-//        Density density = new Density(0.1, 0, 0, 0, 0, 0);
-        System.out.println(density.getTreeDensity());
-        this.densities = new ArrayList(Arrays.asList(
-                new Text("Densité en arbre : " + Double.toString(density.getTreeDensity())),
-                new Text("Densité en jeune pousse" + density.getYoungTreeDensity()),
-                new Text("Densité en plante" + density.getPlantDensity()),
-                new Text("Densité en infecté" + density.getInsectDensity()),
-                new Text("Densité en brûlé" + density.getBurningDensity()),
-                new Text("Densité en cendre" + density.getAshDensity())));
-        densitiesBox.getChildren().addAll(densities);
-        System.out.println();
         gridRootPane.getChildren().clear();
+
         for (int i = 0; i < this.simulationConfig.getGridHeight(); i++) {
             for (int j = 0; j < this.simulationConfig.getGridWidth(); j++) {
                 Pane newCell = new Pane();
@@ -222,9 +217,10 @@ public class Client extends Application implements PropertyChangeListener {
 
     /**
      * Find the next type of the clicked cell
+     *
      * @param currentType current type of the cell
-     * @param x x xCoordinate of the treated cell
-     * @param y y yCoordinate of the treated cell
+     * @param x           x xCoordinate of the treated cell
+     * @param y           y yCoordinate of the treated cell
      * @return the next type of the clicked cell
      */
     public String cycleTypes(String currentType, int x, int y) {
@@ -257,9 +253,10 @@ public class Client extends Application implements PropertyChangeListener {
 
     /**
      * Find the next health of the clicked cell
+     *
      * @param currentHealth current health of the treated cell
-     * @param x xCoordinate of the treated cell
-     * @param y yCoordinate of the treated cell
+     * @param x             xCoordinate of the treated cell
+     * @param y             yCoordinate of the treated cell
      * @return The next health state for the trated cell
      */
     public String cycleHealth(Health currentHealth, int x, int y) {
@@ -299,6 +296,7 @@ public class Client extends Application implements PropertyChangeListener {
 
     /**
      * Start the GUI for the client
+     *
      * @param stage primary window of the gui
      */
     public void start(Stage stage) {
@@ -616,7 +614,6 @@ public class Client extends Application implements PropertyChangeListener {
         gridButtons.setHgap(20);
 
 
-
         HBox askSimulationNameBox = new HBox(50);
         Stage exportSimulationStage = new Stage();
         exportSimulationStage.setTitle("Sauvegarder simulation");
@@ -719,7 +716,6 @@ public class Client extends Application implements PropertyChangeListener {
         configButtons.add(loadSimulation, 1, 1);
 
 
-
         //Simulation control
         HBox controlButtons = new HBox();
         controlButtons.setPadding(new Insets(200, 15, 0, 15));
@@ -750,12 +746,12 @@ public class Client extends Application implements PropertyChangeListener {
             }
             if (this.simulation.getStep() == (this.simulationConfig.getStepsNumber())) {
                 this.simulation.setStep(0);
+                this.simulation.resetDensities();
                 simulation.run();
             }
 
         });
         controlButtons.getChildren().add(playButton);
-
 
 
         // Pause button
@@ -858,14 +854,13 @@ public class Client extends Application implements PropertyChangeListener {
         controlButtons.getChildren().add(stepForward);
         rectDivConfig.getChildren().add(configButtons);
 
-        //Densities
-        VBox densitiesBox = new VBox(10);
-        densitiesBox.setPadding(new Insets(50, 0,0, 0));
+        densitiesBox.getStyleClass().add("densitiesVbox");
+        densitiesBox.setPadding(new Insets(50, 0, -150, 50));
         rectDivConfig.getChildren().add(densitiesBox);
         densitiesBox.getChildren().addAll(densities);
         rectDivConfig.getChildren().add(controlButtons);
         root.getChildren().add(rectDivConfig);
-        refreshDensities();
+
         // Rendering stage
         stage.setMaximized(true);
         stage.setScene(scene);
@@ -873,9 +868,26 @@ public class Client extends Application implements PropertyChangeListener {
         stage.show();
     }
 
-    public void refreshDensities(){
+    public void refreshDensities() {
+        Density density = this.simulation.getDensities().get(this.step - 1);
 
+        String treeDensity = Double.toString(density.getTreeDensity());
+        String youngTreeDensity = Double.toString(density.getYoungTreeDensity());
+        String plantDensity = Double.toString(density.getPlantDensity());
+        String insectDensity = Double.toString(density.getInsectDensity());
+        String burningDensity = Double.toString(density.getBurningDensity());
+        String ashDensity = Double.toString(density.getAshDensity());
 
+        densitiesBox.getChildren().clear();
+        densitiesBox.getChildren().addAll(new ArrayList<>(Arrays.asList(
+                new Text("Densité en arbres: " + treeDensity),
+                new Text("Densité en arbustes: " + youngTreeDensity),
+                new Text("Densité en plantes: " + plantDensity),
+                new Text("Densité en végétaux infectés: " + insectDensity),
+                new Text("Densité en végétaux enflammés: " + burningDensity),
+                new Text("Densité en cendres: " + ashDensity)
+                ))
+        );
     }
 
     public void editSimulationCells(ResultSet gridCells) {
