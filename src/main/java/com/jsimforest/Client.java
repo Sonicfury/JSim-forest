@@ -33,10 +33,10 @@ public class Client extends Application implements PropertyChangeListener {
     private Button activeButton;
     private ResultSet allConfigs;
 
-    public void refreshConfigs(){
-        try{
+    public void refreshConfigs() {
+        try {
             this.allConfigs = Configuration.selectAllConfigurations();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -126,7 +126,7 @@ public class Client extends Application implements PropertyChangeListener {
                 int yCoord = i;
                 int xCoord = j;
                 newCell.setOnMouseClicked((event) -> {
-                    if(this.simulation.isPause()){
+                    if (this.simulation.isPause()) {
                         if (event.getButton().equals(MouseButton.PRIMARY)) {
                             String actualState = newCell.getStyleClass().get(1);
                             newCell.getStyleClass().remove(actualState);
@@ -153,19 +153,19 @@ public class Client extends Application implements PropertyChangeListener {
         switch (currentType) {
             case "null" -> {
                 newType = "plant";
-                this.simulation.getGrid().editCellType(x, y, plantType);
+                this.simulation.getGrid().editCell(x, y, plantType);
             }
             case "plant" -> {
                 newType = "youngTree";
-                this.simulation.getGrid().editCellType(x, y, youngTreeType);
+                this.simulation.getGrid().editCell(x, y, youngTreeType);
             }
             case "youngTree" -> {
                 newType = "tree";
-                this.simulation.getGrid().editCellType(x, y, treeType);
+                this.simulation.getGrid().editCell(x, y, treeType);
             }
             case "tree" -> {
                 newType = "null";
-                this.simulation.getGrid().editCellType(x, y, nullType);
+                this.simulation.getGrid().editCell(x, y, nullType);
             }
             default -> throw new IllegalArgumentException();
         }
@@ -177,15 +177,15 @@ public class Client extends Application implements PropertyChangeListener {
         if (this.simulationConfig.getMode().equals(Mode.fire)) {
             switch (currentHealth) {
                 case ok -> {
-                    this.simulation.getGrid().editCellHealth(x, y, Health.burned);
+                    this.simulation.getGrid().editCell(x, y, Health.burned);
                     newHealth = Health.burned;
                 }
                 case burned -> {
-                    this.simulation.getGrid().editCellHealth(x, y, Health.ash);
+                    this.simulation.getGrid().editCell(x, y, Health.ash);
                     newHealth = Health.ash;
                 }
                 case ash -> {
-                    this.simulation.getGrid().editCellHealth(x, y, Health.ok);
+                    this.simulation.getGrid().editCell(x, y, Health.ok);
                     newHealth = Health.ok;
                 }
                 default -> {
@@ -195,13 +195,13 @@ public class Client extends Application implements PropertyChangeListener {
             }
         } else if (this.simulationConfig.getMode().equals(Mode.insect)) {
             if (currentHealth.equals(Health.ok)) {
-                this.simulation.getGrid().editCellHealth(x, y, Health.infected);
+                this.simulation.getGrid().editCell(x, y, Health.infected);
                 newHealth = Health.infected;
-            }else{
-                this.simulation.getGrid().editCellHealth(x, y, Health.ok);
+            } else {
+                this.simulation.getGrid().editCell(x, y, Health.ok);
                 newHealth = Health.ok;
             }
-        } else{
+        } else {
             newHealth = currentHealth;
         }
         return newHealth.name();
@@ -411,7 +411,7 @@ public class Client extends Application implements PropertyChangeListener {
         submitConfigName.setMinWidth(100);
 
         submitConfigName.setOnMouseClicked((event) -> {
-            if(!askConfigName.getText().equals("")){
+            if (!askConfigName.getText().equals("")) {
                 try {
                     this.simulationConfig.saveConfiguration(askConfigName.getText());
                     exportConfigStage.close();
@@ -428,18 +428,18 @@ public class Client extends Application implements PropertyChangeListener {
         exportConfigStage.setTitle("Nouvelle configuration");
 
         Button saveConfig = new Button("Sauvegarder configuration");
-        saveConfig.setOnMouseClicked((event) ->{
+        saveConfig.setOnMouseClicked((event) -> {
             exportConfigStage.show();
         });
 
         Stage importConfig = new Stage();
-        ScrollPane importerScroll = new ScrollPane();
+        ScrollPane configImporterScroll = new ScrollPane();
         VBox importConfigsRoot = new VBox(50);
         GridPane configs = new GridPane();
-        importerScroll.setContent(configs);
+        configImporterScroll.setContent(configs);
         configs.setHgap(30);
         configs.setVgap(50);
-        importConfigsRoot.getChildren().add(importerScroll);
+        importConfigsRoot.getChildren().add(configImporterScroll);
         Scene importConfigScene = new Scene(importConfigsRoot, 800, 300);
 
         importConfig.setScene(importConfigScene);
@@ -451,15 +451,15 @@ public class Client extends Application implements PropertyChangeListener {
             refreshConfigs();
             configs.getChildren().clear();
             int configNumber = 1;
-            try{
+            try {
                 ResultSet allConfigs = Configuration.selectAllConfigurations();
                 ResultSetMetaData configMD = allConfigs.getMetaData();
-                for(int i = 1; i < configMD.getColumnCount() + 1; i++){
+                for (int i = 1; i <= configMD.getColumnCount(); i++) {
                     configs.add(new Text(configMD.getColumnLabel(i)), i - 1, 0);
                 }
-                while(allConfigs.next()){
+                while (allConfigs.next()) {
                     int line_id = allConfigs.getInt(1);
-                    for(int i = 1; i < configMD.getColumnCount() + 1; i++){
+                    for (int i = 1; i < configMD.getColumnCount() + 1; i++) {
                         Text property = new Text(allConfigs.getString(configMD.getColumnName(i)));
                         property.setTextAlignment(TextAlignment.CENTER);
                         configs.add(property, i - 1, configNumber);
@@ -468,12 +468,12 @@ public class Client extends Application implements PropertyChangeListener {
                     importButton.setOnMouseClicked((importButtonClick -> {
                         try {
                             ResultSet importedConfig = Configuration.selectOneConfiguration(line_id);
-                            while(importedConfig.next()){
+                            while (importedConfig.next()) {
                                 simulationSpeedField.setText(importedConfig.getString(2));
                                 simulationStepField.setText(importedConfig.getString(3));
                                 gridWidthField.setText(importedConfig.getString(4));
                                 gridHeightField.setText(importedConfig.getString(5));
-                                switch(Mode.valueOf(importedConfig.getString(6))){
+                                switch (Mode.valueOf(importedConfig.getString(6))) {
                                     case fire -> {
                                         changeActiveMode(fireModeButton, Mode.fire);
                                     }
@@ -485,11 +485,11 @@ public class Client extends Application implements PropertyChangeListener {
                                     }
                                 }
                                 this.simulationConfig = new Configuration(
-                                    importedConfig.getDouble(2),
-                                    importedConfig.getInt(3),
-                                    Mode.valueOf(importedConfig.getString(6)),
-                                    importedConfig.getInt(4),
-                                    importedConfig.getInt(5)
+                                        importedConfig.getDouble(2),
+                                        importedConfig.getInt(3),
+                                        Mode.valueOf(importedConfig.getString(6)),
+                                        importedConfig.getInt(4),
+                                        importedConfig.getInt(5)
                                 );
                                 this.simulation = new Simulation(this.simulationConfig);
                                 generateGrid(this.gridPane);
@@ -506,7 +506,7 @@ public class Client extends Application implements PropertyChangeListener {
                     configs.add(importButton, 8, configNumber);
                     configNumber++;
                 }
-            }catch (SQLException e){
+            } catch (SQLException e) {
                 refreshConfigs();
                 error.show();
             }
@@ -533,7 +533,7 @@ public class Client extends Application implements PropertyChangeListener {
         askSimulationNameLabel.setMinWidth(150);
         Button submitGridName = new Button("Confirmer");
         submitGridName.setOnMouseClicked((event) -> {
-            if(!askSimulationName.getText().equals("")){
+            if (!askSimulationName.getText().equals("")) {
                 try {
                     int gridId = this.simulation.getGrid().saveGrid();
                     int configId = this.simulationConfig.saveConfiguration(askSimulationName.getText());
@@ -554,9 +554,98 @@ public class Client extends Application implements PropertyChangeListener {
         saveSimulation.setOnMouseClicked((event) -> {
             exportSimulationStage.show();
         });
-
         saveSimulation.getStyleClass().add("button");
+
+
+        Stage loadSimulationStage = new Stage();
+        ScrollPane SimulationLoaderScroll = new ScrollPane();
+        VBox saveSimulationRoot = new VBox(50);
+        GridPane simulations = new GridPane();
+        SimulationLoaderScroll.setContent(simulations);
+        simulations.setHgap(30);
+        simulations.setVgap(50);
+        saveSimulationRoot.getChildren().add(SimulationLoaderScroll);
+        Scene loadSimulationScene = new Scene(saveSimulationRoot, 900, 300);
+        loadSimulationStage.setScene(loadSimulationScene);
         Button loadSimulation = new Button("Charger une simulation");
+        loadSimulation.setOnMouseClicked((event) -> {
+            try {
+                ResultSet allSimulations = Simulation.selectAllSimulations();
+                ResultSetMetaData simulationsMD = allSimulations.getMetaData();
+                for (int column = 4; column <= simulationsMD.getColumnCount(); column++) {
+                    simulations.add(new Text(simulationsMD.getColumnLabel(column)), column - 4, 0);
+                }
+                int simNumber = 1;
+                while (allSimulations.next()) {
+                    int loadingSimu = allSimulations.getInt(1);
+                    Button loadThisSim = new Button("Charger cette simulation");
+                    for (int column = 4; column <= simulationsMD.getColumnCount(); column++) {
+                        simulations.add(new Text(allSimulations.getString(column)), column - 4, simNumber);
+                    }
+                    simulations.add(loadThisSim, 8, simNumber);
+                    loadThisSim.setOnMouseClicked((loadSim) -> {
+                        try {
+                            ResultSet importedSimulationConfig = Simulation.selectOneSimulation(loadingSimu);
+                            if (importedSimulationConfig.next()) {
+                                simulationSpeedField.setText(importedSimulationConfig.getString(7));
+                                simulationStepField.setText(importedSimulationConfig.getString(8));
+                                gridWidthField.setText(importedSimulationConfig.getString(9));
+                                gridHeightField.setText(importedSimulationConfig.getString(10));
+                                switch (Mode.valueOf(importedSimulationConfig.getString(11))) {
+                                    case fire -> {
+                                        changeActiveMode(fireModeButton, Mode.fire);
+                                    }
+                                    case forest -> {
+                                        changeActiveMode(forestModeButton, Mode.forest);
+                                    }
+                                    case insect -> {
+                                        changeActiveMode(bugModeButton, Mode.insect);
+                                    }
+                                }
+                                this.simulationConfig = new Configuration(
+                                        importedSimulationConfig.getDouble(7),
+                                        importedSimulationConfig.getInt(8),
+                                        Mode.valueOf(importedSimulationConfig.getString(11)),
+                                        importedSimulationConfig.getInt(9),
+                                        importedSimulationConfig.getInt(10)
+                                );
+                                this.simulation = new Simulation(this.simulationConfig);
+                            }
+
+                            ResultSet gridCells = Grid.selectGridCells(importedSimulationConfig.getInt(3));
+                            int cellNumber = 0;
+                            while (gridCells.next()) {
+                                System.out.println(cellNumber);
+
+                                this.simulation.getGrid().editCell(
+                                        gridCells.getInt(1),
+                                        gridCells.getInt(2),
+                                        new CellType(gridCells.getString(4), gridCells.getString(5)),
+                                        Health.valueOf(gridCells.getString(3))
+                                );
+
+                                cellNumber++;
+                            }
+                            this.gridPane.getChildren().clear();
+                            this.gridPane.getChildren().clear();
+                            this.gridPane.getChildren().clear();
+
+//                            generateGrid(this.gridPane);
+                            loadSimulationStage.close();
+
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+
+                    });
+
+                }
+
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            loadSimulationStage.show();
+        });
         loadSimulation.getStyleClass().add("button");
 
         configButtons.add(saveConfig, 0, 0);
@@ -596,7 +685,7 @@ public class Client extends Application implements PropertyChangeListener {
             if (this.simulation.getStep() == (this.simulationConfig.getStepsNumber())) {
                 this.simulation.setStep(0);
                 simulation.run();
-            }else{
+            } else {
                 System.out.println(this.simulation.getStep());
                 System.out.println(this.simulationConfig.getStepsNumber());
             }
