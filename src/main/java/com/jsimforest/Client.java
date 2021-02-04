@@ -17,15 +17,19 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
@@ -38,6 +42,7 @@ public class Client extends Application implements PropertyChangeListener {
 
     VBox densitiesBox = new VBox(10);
     ArrayList<Text> densities = new ArrayList<>(Arrays.asList(
+            new Text("Pas : 0/0"),
             new Text("Densité en arbres: "),
             new Text("Densité en arbustes: "),
             new Text("Densité en plantes: "),
@@ -710,15 +715,36 @@ public class Client extends Application implements PropertyChangeListener {
         });
         loadSimulation.getStyleClass().add("button");
 
+        Button exportButton = new Button("Exporter en CSV");
+        final DirectoryChooser directoryChooser = new DirectoryChooser();
+        configureDirectoryChooser(directoryChooser);
+
+        TextArea textArea = new TextArea();
+        textArea.setMinHeight(70);
+
+        exportButton.setOnMouseClicked((event) -> {
+            File dir = directoryChooser.showDialog(stage);
+            if (dir != null) {
+                textArea.setText(dir.getAbsolutePath());
+                try {
+                    Export.export(this.simulation, dir.getAbsolutePath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                textArea.setText(null);
+            }
+        });
+
         configButtons.add(saveConfig, 0, 0);
         configButtons.add(loadConfig, 0, 1);
         configButtons.add(saveSimulation, 1, 0);
         configButtons.add(loadSimulation, 1, 1);
-
+        configButtons.add(exportButton, 0, 2);
 
         //Simulation control
         HBox controlButtons = new HBox();
-        controlButtons.setPadding(new Insets(200, 15, 0, 15));
+        controlButtons.setPadding(new Insets(175, 15, 0, 15));
         controlButtons.getStyleClass().add("controlButtons");
         controlButtons.setAlignment(Pos.CENTER);
         controlButtons.setSpacing(15);
@@ -880,6 +906,7 @@ public class Client extends Application implements PropertyChangeListener {
 
         densitiesBox.getChildren().clear();
         densitiesBox.getChildren().addAll(new ArrayList<>(Arrays.asList(
+                new Text(MessageFormat.format("Pas : {0}/{1}", this.step, this.simulationConfig.getStepsNumber())),
                 new Text("Densité en arbres: " + treeDensity),
                 new Text("Densité en arbustes: " + youngTreeDensity),
                 new Text("Densité en plantes: " + plantDensity),
@@ -966,5 +993,10 @@ public class Client extends Application implements PropertyChangeListener {
             refreshGrid(this.gridPane);
         }
 
+    }
+
+    private void configureDirectoryChooser(DirectoryChooser directoryChooser) {
+        directoryChooser.setTitle("Choisissez un dossier");
+        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
     }
 }
