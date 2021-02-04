@@ -18,7 +18,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.xml.transform.Result;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.ResultSet;
@@ -43,6 +42,9 @@ public class Client extends Application implements PropertyChangeListener {
 
     private ResultSet allConfigs;
 
+    /**
+     * refresh the configs from the database
+     */
     public void refreshConfigs() {
         try {
             this.allConfigs = Configuration.selectAllConfigurations();
@@ -51,6 +53,9 @@ public class Client extends Application implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Refresh the sims from the database
+     */
     public void refreshSims(){
         try{
             this.allSims = Simulation.selectAllSimulations();
@@ -70,8 +75,12 @@ public class Client extends Application implements PropertyChangeListener {
     }
 
     @Override
+    /**
+     * This is executed at each step of the simulation
+     */
     public void propertyChange(PropertyChangeEvent evt) {
         this.setStep((int) evt.getNewValue());
+        System.out.println("step");
         refreshGrid(this.gridPane);
     }
 
@@ -85,6 +94,10 @@ public class Client extends Application implements PropertyChangeListener {
 
     PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
 
+    /**
+     * generate a new grid in the gridroot pane
+     * @param gridRootPane The grid root pane (pane that conatains the cell)
+     */
     private void generateGrid(Pane gridRootPane) {
         for (int i = 0; i < this.simulationConfig.getGridWidth(); i++) {
             for (int j = 0; j < this.simulationConfig.getGridHeight(); j++) {
@@ -112,6 +125,10 @@ public class Client extends Application implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Regenerate a fresh grid with new dimensions
+     * @param gridRootPane The grid root pane (pane that conatains the cell)
+     */
     private void changeGridSize(Pane gridRootPane) {
         try {
             gridRootPane.getChildren().clear();
@@ -121,16 +138,35 @@ public class Client extends Application implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Change the active mod for the config and the active skin for the button
+     * @param newButton the new button to reskin
+     * @param newMode new mode for the simulation
+     */
     private void changeActiveMode(Button newButton, Mode newMode) {
         if (this.step == 0) {
             this.activeButton.getStyleClass().remove("active");
             newButton.getStyleClass().add("active");
             this.activeButton = newButton;
             this.simulationConfig.setMode(newMode);
-            this.generateGrid(this.gridPane);
+            this.healGrid();
+//            this.generateGrid(this.gridPane);
         }
     }
 
+    public void healGrid() {
+        for(int i = 0; i < this.simulationConfig.getGridHeight(); i++){
+            for(int j = 0; j < this.simulationConfig.getGridWidth(); j++){
+                this.simulation.getGrid().getMatrix().get(i).get(j).setHealth(Health.ok);
+            }
+        }
+        refreshGrid(this.gridPane);
+    }
+
+    /**
+     * Refresh the grid of the GUI
+     * @param gridRootPane The grid root pane (pane that conatains the cell)
+     */
     private void refreshGrid(Pane gridRootPane) {
         gridRootPane.getChildren().clear();
         for (int i = 0; i < this.simulationConfig.getGridHeight(); i++) {
@@ -162,6 +198,13 @@ public class Client extends Application implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Find the next type of the clicked cell
+     * @param currentType current type of the cell
+     * @param x x xCoordinate of the treated cell
+     * @param y y yCoordinate of the treated cell
+     * @return the next type of the clicked cell
+     */
     public String cycleTypes(String currentType, int x, int y) {
         String newType;
         CellType nullType = new CellType("null", "white");
@@ -169,7 +212,7 @@ public class Client extends Application implements PropertyChangeListener {
         CellType youngTreeType = new CellType("youngTree", "mediumGreen");
         CellType treeType = new CellType("tree", "green");
         switch (currentType) {
-            case "null" -> {
+            case "null", "empty" -> {
                 newType = "plant";
                 this.simulation.getGrid().editCell(x, y, plantType);
             }
@@ -190,6 +233,13 @@ public class Client extends Application implements PropertyChangeListener {
         return newType;
     }
 
+    /**
+     * Find the next health of the clicked cell
+     * @param currentHealth current health of the treated cell
+     * @param x xCoordinate of the treated cell
+     * @param y yCoordinate of the treated cell
+     * @return The next health state for the trated cell
+     */
     public String cycleHealth(Health currentHealth, int x, int y) {
         Health newHealth;
         if (this.simulationConfig.getMode().equals(Mode.fire)) {
@@ -225,6 +275,10 @@ public class Client extends Application implements PropertyChangeListener {
         return newHealth.name();
     }
 
+    /**
+     * Start the GUI for the client
+     * @param stage primary window of the gui
+     */
     public void start(Stage stage) {
         //Default config
         this.simulationConfig = new Configuration();
@@ -672,9 +726,6 @@ public class Client extends Application implements PropertyChangeListener {
             if (this.simulation.getStep() == (this.simulationConfig.getStepsNumber())) {
                 this.simulation.setStep(0);
                 simulation.run();
-            } else {
-                System.out.println(this.simulation.getStep());
-                System.out.println(this.simulationConfig.getStepsNumber());
             }
 
         });
