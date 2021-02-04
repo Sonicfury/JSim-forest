@@ -1,5 +1,6 @@
 package com.jsimforest;
 
+import com.mysql.cj.protocol.Resultset;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -17,6 +18,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javax.xml.transform.Result;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.ResultSet;
@@ -560,87 +562,55 @@ public class Client extends Application implements PropertyChangeListener {
         Stage loadSimulationStage = new Stage();
         ScrollPane SimulationLoaderScroll = new ScrollPane();
         VBox saveSimulationRoot = new VBox(50);
-        GridPane simulations = new GridPane();
-        SimulationLoaderScroll.setContent(simulations);
-        simulations.setHgap(30);
-        simulations.setVgap(50);
+        GridPane simulationsList = new GridPane();
+        SimulationLoaderScroll.setContent(simulationsList);
+        simulationsList.setHgap(30);
+        simulationsList.setVgap(50);
         saveSimulationRoot.getChildren().add(SimulationLoaderScroll);
         Scene loadSimulationScene = new Scene(saveSimulationRoot, 900, 300);
         loadSimulationStage.setScene(loadSimulationScene);
         Button loadSimulation = new Button("Charger une simulation");
+
         loadSimulation.setOnMouseClicked((event) -> {
             try {
                 ResultSet allSimulations = Simulation.selectAllSimulations();
                 ResultSetMetaData simulationsMD = allSimulations.getMetaData();
+
                 for (int column = 4; column <= simulationsMD.getColumnCount(); column++) {
-                    simulations.add(new Text(simulationsMD.getColumnLabel(column)), column - 4, 0);
+
+                    simulationsList.add(new Text(simulationsMD.getColumnLabel(column)), column - 4, 0);
                 }
-                int simNumber = 1;
+
+                int simulationRow = 1;
+
                 while (allSimulations.next()) {
-                    int loadingSimu = allSimulations.getInt(1);
-                    Button loadThisSim = new Button("Charger cette simulation");
+
+                    int loadingSimuId = allSimulations.getInt(1);
+                    Button loadThisSimButton = new Button("Charger cette simulation");
+
                     for (int column = 4; column <= simulationsMD.getColumnCount(); column++) {
-                        simulations.add(new Text(allSimulations.getString(column)), column - 4, simNumber);
+
+                        simulationsList.add(new Text(allSimulations.getString(column)), column - 4, simulationRow);
                     }
-                    simulations.add(loadThisSim, 8, simNumber);
-                    loadThisSim.setOnMouseClicked((loadSim) -> {
-                        try {
-                            ResultSet importedSimulationConfig = Simulation.selectOneSimulation(loadingSimu);
-                            if (importedSimulationConfig.next()) {
-                                simulationSpeedField.setText(importedSimulationConfig.getString(7));
-                                simulationStepField.setText(importedSimulationConfig.getString(8));
-                                gridWidthField.setText(importedSimulationConfig.getString(9));
-                                gridHeightField.setText(importedSimulationConfig.getString(10));
-                                switch (Mode.valueOf(importedSimulationConfig.getString(11))) {
-                                    case fire -> {
-                                        changeActiveMode(fireModeButton, Mode.fire);
-                                    }
-                                    case forest -> {
-                                        changeActiveMode(forestModeButton, Mode.forest);
-                                    }
-                                    case insect -> {
-                                        changeActiveMode(bugModeButton, Mode.insect);
-                                    }
-                                }
-                                this.simulationConfig = new Configuration(
-                                        importedSimulationConfig.getDouble(7),
-                                        importedSimulationConfig.getInt(8),
-                                        Mode.valueOf(importedSimulationConfig.getString(11)),
-                                        importedSimulationConfig.getInt(9),
-                                        importedSimulationConfig.getInt(10)
-                                );
-                                this.simulation = new Simulation(this.simulationConfig);
-                            }
 
-                            ResultSet gridCells = Grid.selectGridCells(importedSimulationConfig.getInt(3));
-                            int cellNumber = 0;
-                            while (gridCells.next()) {
-                                System.out.println(cellNumber);
+                    simulationsList.add(loadThisSimButton, 8, simulationRow);
 
-                                this.simulation.getGrid().editCell(
-                                        gridCells.getInt(1),
-                                        gridCells.getInt(2),
-                                        new CellType(gridCells.getString(4), gridCells.getString(5)),
-                                        Health.valueOf(gridCells.getString(3))
-                                );
-
-                                cellNumber++;
-                            }
-                            this.gridPane.getChildren().clear();
-                            this.gridPane.getChildren().clear();
-                            this.gridPane.getChildren().clear();
-
-//                            generateGrid(this.gridPane);
-                            loadSimulationStage.close();
-
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
-
+                    loadThisSimButton.setOnMouseClicked((loadSim) -> {
+                        onLoadSimButtonClicked(
+                                loadingSimuId,
+                                simulationSpeedField,
+                                simulationStepField,
+                                gridWidthField,
+                                gridHeightField,
+                                forestModeButton,
+                                fireModeButton,
+                                bugModeButton,
+                                loadSimulationStage
+                        );
                     });
 
+                    simulationRow++;
                 }
-
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -800,5 +770,83 @@ public class Client extends Application implements PropertyChangeListener {
         stage.setScene(scene);
         stage.setTitle("Simulation JSIMForest");
         stage.show();
+    }
+
+    public void editSimulationCells(ResultSet gridCells) {
+        try {
+            while (gridCells.next()) {
+                int i = gridCells.getInt(1);
+                int j = gridCells.getInt(2);
+                String cellTypeName = gridCells.getString(4);
+                String cellTypeColor = gridCells.getString(5);
+                String cellHealth = gridCells.getString(3);
+                CellType newCellType = new CellType(cellTypeName, cellHealth);
+                Health health = Health.valueOf(cellHealth);
+
+                this.simulation.getGrid().editCell(i, j, newCellType, health);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onLoadSimButtonClicked(
+            int loadingSimu,
+            TextField simulationSpeedField,
+            TextField simulationStepField,
+            TextField gridWidthField,
+            TextField gridHeightField,
+            Button forestModeButton,
+            Button fireModeButton,
+            Button bugModeButton,
+            Stage loadSimulationStage
+    ) {
+        try {
+            ResultSet importedSimulationConfig = Simulation.selectOneSimulation(loadingSimu);
+
+            if (importedSimulationConfig.next()) {
+
+                simulationSpeedField.setText(importedSimulationConfig.getString(7));
+                simulationStepField.setText(importedSimulationConfig.getString(8));
+                gridWidthField.setText(importedSimulationConfig.getString(9));
+                gridHeightField.setText(importedSimulationConfig.getString(10));
+
+                switch (Mode.valueOf(importedSimulationConfig.getString(11))) {
+                    case fire -> {
+                        changeActiveMode(fireModeButton, Mode.fire);
+                    }
+                    case forest -> {
+                        changeActiveMode(forestModeButton, Mode.forest);
+                    }
+                    case insect -> {
+                        changeActiveMode(bugModeButton, Mode.insect);
+                    }
+                }
+
+                this.simulationConfig = new Configuration(
+                        importedSimulationConfig.getDouble(7),
+                        importedSimulationConfig.getInt(8),
+                        Mode.valueOf(importedSimulationConfig.getString(11)),
+                        importedSimulationConfig.getInt(9),
+                        importedSimulationConfig.getInt(10)
+                );
+
+                this.simulation = new Simulation(this.simulationConfig);
+            }
+
+            ResultSet gridCells = Grid.selectGridCells(importedSimulationConfig.getInt(3));
+
+            editSimulationCells(gridCells);
+
+            this.gridPane.getChildren().clear();
+
+            loadSimulationStage.close();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            refreshGrid(this.gridPane);
+        }
+
     }
 }
