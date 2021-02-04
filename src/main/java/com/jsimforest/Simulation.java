@@ -124,11 +124,42 @@ public class Simulation {
     }
 
     /**
-     * Walks the neighborhood of i & j coordinates.
-     * @param i central cell x coordinate
-     * @param j central cell y coordinate
-     * @param matrix the matrix
-     * @return TypesAndHealthsList A lists of types and healths of the neighbor cells of i j coordinates
+     *
+     * @param i
+     * @param j
+     * @param k
+     * @param l
+     * @param matrix
+     * @param cellTypesList
+     * @param cellHealthList
+     */
+    public void addToHealthAndTypesList(int i, int j, int k, int l, ArrayList<ArrayList<Cell>> matrix, List<String> cellTypesList, List<Health> cellHealthList){
+        if (!(i == k && j == l) && l >= 0 && l < matrix.get(i).size()) { // do not add centralCell's cellType to the list
+            Cell c = matrix.get(k).get(l);
+            cellTypesList.add(c.getCellType().getName());
+
+            if (this.configuration.getMode().equals(Mode.fire)) {
+                cellHealthList.add(c.getHealth());
+            } else if (
+                    this.configuration.getMode().equals(Mode.insect)
+                            && (
+                            (k == i - 1 && l == j)
+                                || (k == i && l == j - 1)
+                                || (k == i + 1 && l == j)
+                                || (k == i && l == j + 1)
+                    )
+            ) {
+                cellHealthList.add(c.getHealth());
+            }
+        }
+    }
+
+    /**
+     *
+     * @param i
+     * @param j
+     * @param matrix
+     * @return
      */
     public TypesAndHealthsList getCellsTypeAndHealth(int i, int j, ArrayList<ArrayList<Cell>> matrix) {
         List<String> cellTypesList = new ArrayList<>();
@@ -137,24 +168,8 @@ public class Simulation {
         for (int k = i - 1; k <= i + 1; k++) {
             if (k >= 0 && k < matrix.size()) {
                 for (int l = j - 1; l <= j + 1; l++) {
-                    // do not add centralCell's cellType to the list
-                    if (!(i == k && j == l) && l >= 0 && l < matrix.get(i).size()) {
-                        Cell c = matrix.get(k).get(l);
-                        cellTypesList.add(c.getCellType().getName());
-                        if (this.configuration.getMode().equals(Mode.fire)) {
-                            cellHealthList.add(c.getHealth());
-                        } else if (
-                                this.configuration.getMode().equals(Mode.insect)
-                                        && (
-                                        (k == i - 1 && l == j)
-                                                || (k == i && l == j - 1)
-                                                || (k == i + 1 && l == j)
-                                                || (k == i && l == j + 1)
-                                )
-                        ) {
-                            cellHealthList.add(c.getHealth());
-                        }
-                    }
+
+                    addToHealthAndTypesList(i, j, k, l, matrix, cellTypesList, cellHealthList);
                 }
             }
         }
