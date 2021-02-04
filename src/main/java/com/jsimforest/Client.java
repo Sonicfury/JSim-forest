@@ -1,6 +1,5 @@
 package com.jsimforest;
 
-import com.mysql.cj.protocol.Resultset;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -8,6 +7,10 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -23,17 +26,23 @@ import java.beans.PropertyChangeListener;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
 public class Client extends Application implements PropertyChangeListener {
+    private ArrayList densities = new ArrayList(Arrays.asList(
+            new Text("Densité en arbre : 0"),
+                new Text("Densité en jeune pousse : 0"),
+                new Text("Densité en plante : 0"),
+                new Text("Densité en infecté : 0"),
+                new Text("Densité en brûlé : 0"),
+                new Text("Densité en cendre : 0")));
     private final Pane gridPane = new Pane();
     private ResultSet allSims;
     private Button activeButton;
     private boolean locker = false;
+    public VBox densitiesBox = new VBox(10);
 
     public void setLocker(boolean locker) {
         this.locker = locker;
@@ -79,6 +88,7 @@ public class Client extends Application implements PropertyChangeListener {
      * This is executed at each step of the simulation
      */
     public void propertyChange(PropertyChangeEvent evt) {
+        refreshDensities();
         this.setStep((int) evt.getNewValue());
         System.out.println("step");
         refreshGrid(this.gridPane);
@@ -168,6 +178,18 @@ public class Client extends Application implements PropertyChangeListener {
      * @param gridRootPane The grid root pane (pane that conatains the cell)
      */
     private void refreshGrid(Pane gridRootPane) {
+        Density density = this.simulation.getDensities().get(this.step - 1);
+//        Density density = new Density(0.1, 0, 0, 0, 0, 0);
+        System.out.println(density.getTreeDensity());
+        this.densities = new ArrayList(Arrays.asList(
+                new Text("Densité en arbre : " + Double.toString(density.getTreeDensity())),
+                new Text("Densité en jeune pousse" + density.getYoungTreeDensity()),
+                new Text("Densité en plante" + density.getPlantDensity()),
+                new Text("Densité en infecté" + density.getInsectDensity()),
+                new Text("Densité en brûlé" + density.getBurningDensity()),
+                new Text("Densité en cendre" + density.getAshDensity())));
+        densitiesBox.getChildren().addAll(densities);
+        System.out.println();
         gridRootPane.getChildren().clear();
         for (int i = 0; i < this.simulationConfig.getGridHeight(); i++) {
             for (int j = 0; j < this.simulationConfig.getGridWidth(); j++) {
@@ -593,6 +615,8 @@ public class Client extends Application implements PropertyChangeListener {
         gridButtons.setVgap(20);
         gridButtons.setHgap(20);
 
+
+
         HBox askSimulationNameBox = new HBox(50);
         Stage exportSimulationStage = new Stage();
         exportSimulationStage.setTitle("Sauvegarder simulation");
@@ -695,9 +719,10 @@ public class Client extends Application implements PropertyChangeListener {
         configButtons.add(loadSimulation, 1, 1);
 
 
+
         //Simulation control
         HBox controlButtons = new HBox();
-        controlButtons.setPadding(new Insets(300, 15, 0, 15));
+        controlButtons.setPadding(new Insets(200, 15, 0, 15));
         controlButtons.getStyleClass().add("controlButtons");
         controlButtons.setAlignment(Pos.CENTER);
         controlButtons.setSpacing(15);
@@ -730,6 +755,8 @@ public class Client extends Application implements PropertyChangeListener {
 
         });
         controlButtons.getChildren().add(playButton);
+
+
 
         // Pause button
         SVGPath pauseSVG = new SVGPath();
@@ -830,14 +857,25 @@ public class Client extends Application implements PropertyChangeListener {
         }));
         controlButtons.getChildren().add(stepForward);
         rectDivConfig.getChildren().add(configButtons);
+
+        //Densities
+        VBox densitiesBox = new VBox(10);
+        densitiesBox.setPadding(new Insets(50, 0,0, 0));
+        rectDivConfig.getChildren().add(densitiesBox);
+        densitiesBox.getChildren().addAll(densities);
         rectDivConfig.getChildren().add(controlButtons);
         root.getChildren().add(rectDivConfig);
-
+        refreshDensities();
         // Rendering stage
         stage.setMaximized(true);
         stage.setScene(scene);
         stage.setTitle("Simulation JSIMForest");
         stage.show();
+    }
+
+    public void refreshDensities(){
+
+
     }
 
     public void editSimulationCells(ResultSet gridCells) {
