@@ -16,7 +16,7 @@ $ash: hsl(0, 0%, 50.2%);
   -fx-border-width: 1px;
 }
 
-.null {
+.null, .empty {
   -fx-background-color: $null;
 }
 

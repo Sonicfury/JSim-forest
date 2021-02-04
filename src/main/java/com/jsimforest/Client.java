@@ -32,13 +32,29 @@ import static java.lang.Integer.parseInt;
 
 public class Client extends Application implements PropertyChangeListener {
     private final Pane gridPane = new Pane();
+    private ResultSet allSims;
     private Button activeButton;
+    private boolean locker = false;
+
+    public void setLocker(boolean locker) {
+        this.locker = locker;
+    }
+
+
     private ResultSet allConfigs;
 
     public void refreshConfigs() {
         try {
             this.allConfigs = Configuration.selectAllConfigurations();
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void refreshSims(){
+        try{
+            this.allSims = Simulation.selectAllSimulations();
+        }catch (SQLException e){
             System.out.println(e.getMessage());
         }
     }
@@ -285,7 +301,7 @@ public class Client extends Application implements PropertyChangeListener {
         generateGrid(this.gridPane);
         scrollPane.setContent(this.gridPane);
         gridWidthField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.equals("") && parseInt(newValue) >= 3) {
+            if (!newValue.equals("") && parseInt(newValue) >= 3 && !this.locker) {
                 pause.setOnFinished(event -> {
                     this.simulationConfig.setGridWidth(parseInt(newValue));
                     this.simulation.newGrid();
@@ -296,7 +312,7 @@ public class Client extends Application implements PropertyChangeListener {
 
         });
         gridHeightField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.equals("") && parseInt(newValue) >= 3)
+            if (!newValue.equals("") && parseInt(newValue) >= 3 && !this.locker)
                 pause.setOnFinished(event -> {
                     this.simulationConfig.setGridHeight(parseInt(newValue));
                     this.simulation.newGrid();
@@ -573,8 +589,9 @@ public class Client extends Application implements PropertyChangeListener {
 
         loadSimulation.setOnMouseClicked((event) -> {
             try {
-                ResultSet allSimulations = Simulation.selectAllSimulations();
-                ResultSetMetaData simulationsMD = allSimulations.getMetaData();
+                refreshSims();
+                simulationsList.getChildren().clear();
+                ResultSetMetaData simulationsMD = allSims.getMetaData();
 
                 for (int column = 4; column <= simulationsMD.getColumnCount(); column++) {
 
@@ -583,14 +600,14 @@ public class Client extends Application implements PropertyChangeListener {
 
                 int simulationRow = 1;
 
-                while (allSimulations.next()) {
+                while (allSims.next()) {
 
-                    int loadingSimuId = allSimulations.getInt(1);
+                    int loadingSimuId = allSims.getInt(1);
                     Button loadThisSimButton = new Button("Charger cette simulation");
 
                     for (int column = 4; column <= simulationsMD.getColumnCount(); column++) {
 
-                        simulationsList.add(new Text(allSimulations.getString(column)), column - 4, simulationRow);
+                        simulationsList.add(new Text(allSims.getString(column)), column - 4, simulationRow);
                     }
 
                     simulationsList.add(loadThisSimButton, 8, simulationRow);
@@ -805,12 +822,12 @@ public class Client extends Application implements PropertyChangeListener {
             ResultSet importedSimulationConfig = Simulation.selectOneSimulation(loadingSimu);
 
             if (importedSimulationConfig.next()) {
-
+                setLocker(true);
                 simulationSpeedField.setText(importedSimulationConfig.getString(7));
                 simulationStepField.setText(importedSimulationConfig.getString(8));
                 gridWidthField.setText(importedSimulationConfig.getString(9));
                 gridHeightField.setText(importedSimulationConfig.getString(10));
-
+                setLocker(false);
                 switch (Mode.valueOf(importedSimulationConfig.getString(11))) {
                     case fire -> {
                         changeActiveMode(fireModeButton, Mode.fire);
