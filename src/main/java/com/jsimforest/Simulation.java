@@ -1,6 +1,7 @@
 package com.jsimforest;
 
 import java.sql.ResultSet;
+
 import javafx.application.Platform;
 
 import java.sql.SQLException;
@@ -17,6 +18,7 @@ public class Simulation {
 
     private int step;
     private int elapsedTime;
+    private ArrayList<Density> densities = new ArrayList<>();
 
     public boolean isPause() {
         return pause;
@@ -37,6 +39,9 @@ public class Simulation {
         this.stepObservable = new PCLStep();
     }
 
+    /**
+     * Resets the grid
+     */
     public void newGrid() {
         this.grid = new Grid(this.configuration.getGridWidth(), this.configuration.getGridHeight());
     }
@@ -60,14 +65,28 @@ public class Simulation {
         return elapsedTime;
     }
 
-    public void pause(){
+    public ArrayList<Density> getDensities() {
+
+        return densities;
+    }
+
+    /**
+     * Pauses the simulation
+     */
+    public void pause() {
         this.pause = true;
     }
 
-    public void resume(){
+    /**
+     * Resumes the simulation
+     */
+    public void resume() {
         this.pause = false;
     }
 
+    /**
+     * Runs steps of the simulation.
+     */
     public void run() {
         double stepsPerSecond = this.configuration.getStepsPerSecond();
         int interval = (int) (1000 / stepsPerSecond);
@@ -104,6 +123,13 @@ public class Simulation {
         }
     }
 
+    /**
+     * Walks the neighborhood of i & j coordinates.
+     * @param i central cell x coordinate
+     * @param j central cell y coordinate
+     * @param matrix the matrix
+     * @return TypesAndHealthsList A lists of types and healths of the neighbor cells of i j coordinates
+     */
     public TypesAndHealthsList getCellsTypeAndHealth(int i, int j, ArrayList<ArrayList<Cell>> matrix) {
         List<String> cellTypesList = new ArrayList<>();
         List<Health> cellHealthList = new ArrayList<>();
@@ -136,6 +162,16 @@ public class Simulation {
         return new TypesAndHealthsList(cellTypesList, cellHealthList);
     }
 
+    /**
+     * Walks through each list to evolve related cells
+     * @param toReset
+     * @param toAsh
+     * @param toBurning
+     * @param toInfected
+     * @param toPlant
+     * @param toYoungTree
+     * @param toTree
+     */
     public void evolveCells(
             ArrayList<Cell> toReset,
             ArrayList<Cell> toAsh,
@@ -174,6 +210,19 @@ public class Simulation {
         }
     }
 
+    /**
+     * Tells wether a cell should evolve and in what type/health
+     * @param centralCell
+     * @param cellTypesList
+     * @param cellHealthList
+     * @param toReset
+     * @param toAsh
+     * @param toBurning
+     * @param toInfected
+     * @param toPlant
+     * @param toYoungTree
+     * @param toTree
+     */
     public void checkCentralCellForEvolution(
             Cell centralCell,
             List<String> cellTypesList,
@@ -233,6 +282,9 @@ public class Simulation {
         }
     }
 
+    /**
+     * One step
+     */
     public void step() {
         ArrayList<ArrayList<Cell>> matrix = this.grid.getMatrix();
 
@@ -244,7 +296,6 @@ public class Simulation {
         ArrayList<Cell> toInfected = new ArrayList<>();
         ArrayList<Cell> toAsh = new ArrayList<>();
         ArrayList<Cell> toReset = new ArrayList<>();
-
 
         for (int i = 0; i < matrix.size(); i++) {
             for (int j = 0; j < matrix.get(i).size(); j++) {
@@ -259,10 +310,60 @@ public class Simulation {
                 checkCentralCellForEvolution(centralCell, cellTypesList, cellHealthList, toReset, toAsh, toBurning, toInfected, toPlant, toYoungTree, toTree);
             }
         }
+
         evolveCells(toReset, toAsh, toBurning, toInfected, toPlant, toYoungTree, toTree);
+        calculateDensity(matrix);
 
         this.step += 1;
         this.stepObservable.setStep(this.step);
+    }
+
+    /**
+     * Calculates instant density for a step and adds it to the Simulation.densities for history.
+     * @param matrix
+     */
+    public void calculateDensity(ArrayList<ArrayList<Cell>> matrix) {
+        int plantTypeTotalCount = 0;
+        int youngTreeTypeTotalCount = 0;
+        int treeTypeTotalCount = 0;
+
+        int burningTotalCount = 0;
+        int ashTotalCount = 0;
+        int infectedTotalCount = 0;
+
+        for (ArrayList<Cell> cells : matrix) {
+            for (Cell centralCell : cells) {
+                if (plantType.equals(centralCell.getCellType())) {
+                    plantTypeTotalCount++;
+                } else if (youngTreeType.equals(centralCell.getCellType())) {
+                    youngTreeTypeTotalCount++;
+                } else if (treeType.equals(centralCell.getCellType())) {
+                    treeTypeTotalCount++;
+                }
+
+                if (Health.burned.equals(centralCell.getHealth())) {
+                    burningTotalCount++;
+                } else if (Health.ash.equals(centralCell.getHealth())) {
+                    ashTotalCount++;
+                } else if (Health.infected.equals(centralCell.getHealth())) {
+                    infectedTotalCount++;
+                }
+            }
+        }
+
+        int cellsCount = this.grid.getHeight() * this.grid.getWidth();
+
+        double plantDensity = (double) plantTypeTotalCount / (double) cellsCount;
+        double youngTreeDensity = (double) youngTreeTypeTotalCount / (double) cellsCount;
+        double treeDensity = (double) treeTypeTotalCount / (double) cellsCount;
+
+        double burningDensity = (double) burningTotalCount / (double) cellsCount;
+        double ashDensity = (double) ashTotalCount / (double) cellsCount;
+        double infectedDensity = (double) infectedTotalCount / (double) cellsCount;
+
+        this.densities.add(
+                new Density(plantDensity, youngTreeDensity, treeDensity, burningDensity, ashDensity, infectedDensity)
+        );
     }
 
     /**
@@ -284,6 +385,9 @@ public class Simulation {
         DataBaseInterface.insert(sql);
     }
 
+    /**
+     * Static class containing a list of healths and a list of types (for the neighborhood).
+     */
     static class TypesAndHealthsList {
         List<String> cellTypesList;
         List<Health> cellHealthList;
