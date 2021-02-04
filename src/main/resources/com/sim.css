@@ -48,12 +48,18 @@
   -fx-min-height: 1020;
   -fx-border-radius: 10 10 10 10;
 }
+#configDiv .densitiesVbox * {
+  -fx-font-size: 16;
+}
 #configDiv .buttonsGrid .button {
   -fx-background-color: #2d3748;
   -fx-font-size: 18;
   -fx-max-width: 255;
   -fx-min-width: 255;
   -fx-text-fill: white;
+}
+#configDiv .buttonsGrid .button:hover {
+  /*-fx-text-fill: red;*/
 }
 #configDiv .modeButtons .modeButton {
   -fx-min-width: 104;
