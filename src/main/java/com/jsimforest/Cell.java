@@ -145,14 +145,32 @@ public class Cell {
      * @throws SQLException sql exception
      */
 
-    public void saveCell(int idType, int idGrid) throws SQLException {
-
-        String sql = MessageFormat.format(
-                "INSERT INTO Cells (coordX, coordY, health, id_Types, id_Grids) VALUES ( {0}, {1}, {2}, {3}, {4} )",
-                this.coordX, this.coordY, this.health, idType, idGrid);
-
-        DataBaseInterface.insert(sql);
-    }
+//    public void saveCell(int idGrid) throws SQLException {
+//        int idType;
+//        switch(cellType.getName()){
+//            case "plant" -> {
+//                idType = 2;
+//            }
+//            case "yougTree" -> {
+//                idType = 3;
+//            }
+//            case "null" -> {
+//                idType = 1;
+//            }
+//            case "tree" -> {
+//                idType = 4;
+//            }
+//            default -> {
+//                throw new IllegalArgumentException("Le type fourni n'est pas correct");
+//            }
+//        }
+//        String exportedHealth = "'" + this.health.toString() + "'";
+//        String sql = MessageFormat.format(
+//                "INSERT INTO Cells (coordX, coordY, health, id_Types, id_Grids) VALUES ( {0}, {1}, {2}, {3}, {4} )",
+//                this.coordX, this.coordY, exportedHealth, idType, idGrid);
+//
+//        DataBaseInterface.insert(sql);
+//    }
 
     public void setFire(){
         int randInt = (int) (Math.random() * 100);

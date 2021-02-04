@@ -126,7 +126,7 @@ public class Configuration implements DataBaseInterface {
      * @throws SQLException sql exception
      */
 
-    public void saveConfiguration(String name) throws SQLException {
+    public int saveConfiguration(String name) throws SQLException {
 
         String mode = "'" + this.mode.name() + "'";
 
@@ -140,7 +140,7 @@ public class Configuration implements DataBaseInterface {
                 "INSERT INTO Configurations (name, creationDate, execSpeed, stepNumber, gridWidth, gridHeight, configMode) VALUES ( {0}, {1}, {2}, {3}, {4}, {5}, {6} )",
                 nameReformat, creationDate, this.stepsPerSecond, this.stepsNumber, this.gridWidth, this.gridHeight, mode);
 
-        DataBaseInterface.insert(sql);
+        return DataBaseInterface.insert(sql);
     }
 
     public static ResultSet selectOneConfiguration(int id) throws  SQLException {
