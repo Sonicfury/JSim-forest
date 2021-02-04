@@ -6,18 +6,22 @@ import java.sql.Statement;
 
 public interface DataBaseInterface {
 
-    static void insert(String sql) throws SQLException {
-
-        DataSource.connect();
+    static int insert(String sql) throws SQLException {
 
         Statement statement = DataSource.connection.createStatement();
 
-        statement.executeUpdate(sql);
+        int lastId;
+        statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+        ResultSet lastResult = statement.getGeneratedKeys();
+        if (lastResult.next()) {
+            lastId = lastResult.getInt(1);
+        } else {
+            throw new SQLException("Impossible d'obtenir le dernier identifiant");
+        }
+        return lastId;
     }
 
-    static ResultSet select(String sql) throws SQLException{
-
-        DataSource.connect();
+    static ResultSet select(String sql) throws SQLException {
 
         Statement statement = DataSource.connection.createStatement();
 

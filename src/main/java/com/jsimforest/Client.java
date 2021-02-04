@@ -366,7 +366,6 @@ public class Client extends Application implements PropertyChangeListener {
                 changeActiveMode(fireModeButton, Mode.fire);
             }
         });
-//        fireModeButton.setId("fireMode");
 
         simMode.getChildren().add(fireModeButton);
 
@@ -514,15 +513,56 @@ public class Client extends Application implements PropertyChangeListener {
             importConfig.show();
         });
         loadConfig.getStyleClass().add("button");
-        Button exportGrid = new Button("Exporter la grille");
-        exportGrid.getStyleClass().add("button");
-        Button importGrid = new Button("Importer la grille");
-        importGrid.getStyleClass().add("button");
+
+        GridPane gridButtons = new GridPane();
+        gridButtons.setAlignment(Pos.CENTER);
+        gridButtons.setPadding(new Insets(50, 0, 0, 0));
+        gridButtons.getStyleClass().add("buttonsGrid");
+        gridButtons.setVgap(20);
+        gridButtons.setHgap(20);
+
+        HBox askSimulationNameBox = new HBox(50);
+        Stage exportSimulationStage = new Stage();
+        exportSimulationStage.setTitle("Sauvegarder simulation");
+        Scene exportSimulationScene = new Scene(askSimulationNameBox, 750, 50);
+        exportSimulationStage.setScene(exportSimulationScene);
+
+        TextField askSimulationName = new TextField();
+        askSimulationName.setMinWidth(350);
+        Label askSimulationNameLabel = new Label("Quel est le nom de votre grille : ");
+        askSimulationNameLabel.setMinWidth(150);
+        Button submitGridName = new Button("Confirmer");
+        submitGridName.setOnMouseClicked((event) -> {
+            if(!askSimulationName.getText().equals("")){
+                try {
+                    int gridId = this.simulation.getGrid().saveGrid();
+                    int configId = this.simulationConfig.saveConfiguration(askSimulationName.getText());
+                    this.simulation.saveSimulation(askSimulationName.getText(), gridId, configId);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                exportSimulationStage.close();
+            }
+        });
+        submitGridName.setMinWidth(100);
+        askSimulationNameBox.getChildren().addAll(Arrays.asList(askSimulationNameLabel, askSimulationName, submitGridName));
+
+
+        askConfigName.setMinWidth(250);
+
+        Button saveSimulation = new Button("Sauvegarder la simulation");
+        saveSimulation.setOnMouseClicked((event) -> {
+            exportSimulationStage.show();
+        });
+
+        saveSimulation.getStyleClass().add("button");
+        Button loadSimulation = new Button("Charger une simulation");
+        loadSimulation.getStyleClass().add("button");
 
         configButtons.add(saveConfig, 0, 0);
         configButtons.add(loadConfig, 0, 1);
-        configButtons.add(exportGrid, 1, 0);
-        configButtons.add(importGrid, 1, 1);
+        configButtons.add(saveSimulation, 1, 0);
+        configButtons.add(loadSimulation, 1, 1);
 
 
         //Simulation control
@@ -541,9 +581,6 @@ public class Client extends Application implements PropertyChangeListener {
         playSVG.setFill(Color.WHITE);
         playButton.getStyleClass().add("controlButton");
         playButton.setOnMouseClicked((event) -> {
-            if (this.simulation.getStep() == (this.simulationConfig.getStepsNumber() + 1)) {
-                this.simulation.setStep(0);
-            }
             if (!this.simulation.isPause() && this.simulation.getStep() == 0) {
                 this.initialState = new Simulation(this.simulationConfig);
                 this.initialState.getGrid().setMatrix((ArrayList<ArrayList<Cell>>) this.simulation.getGrid().clone());
