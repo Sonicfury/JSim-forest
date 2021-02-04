@@ -19,6 +19,8 @@ import javafx.util.Duration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +29,17 @@ import java.util.Collections;
 import static java.lang.Integer.parseInt;
 
 public class Client extends Application implements PropertyChangeListener {
-    private Pane gridPane = new Pane();
+    private final Pane gridPane = new Pane();
     private Button activeButton;
+    private ResultSet allConfigs;
+
+    public void refreshConfigs(){
+        try{
+            this.allConfigs = Configuration.selectAllConfigurations();
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+    }
 
     private int step;
 
@@ -92,11 +103,13 @@ public class Client extends Application implements PropertyChangeListener {
         }
     }
 
-    private void changeActiveMode(Button newButton) {
+    private void changeActiveMode(Button newButton, Mode newMode) {
         if (this.step == 0) {
             this.activeButton.getStyleClass().remove("active");
             newButton.getStyleClass().add("active");
             this.activeButton = newButton;
+            this.simulationConfig.setMode(newMode);
+            this.generateGrid(this.gridPane);
         }
     }
 
@@ -198,6 +211,17 @@ public class Client extends Application implements PropertyChangeListener {
         //Default config
         this.simulationConfig = new Configuration();
         this.simulation = new Simulation(simulationConfig);
+
+        // alerts
+
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle("Erreur");
+        error.setHeaderText("");
+        error.setContentText("Une erreur est survenue pendant l'envoi de la configuration");
+        Alert successful = new Alert(Alert.AlertType.INFORMATION);
+        successful.setTitle("Succés");
+        successful.setHeaderText("");
+        successful.setContentText("Votre configuration est sauvegardée");
 
         // Getting screen dimension
         Screen screen = Screen.getPrimary();
@@ -308,74 +332,6 @@ public class Client extends Application implements PropertyChangeListener {
             }
         });
 
-        // Boutons configuration
-        GridPane configButtons = new GridPane();
-        configButtons.setAlignment(Pos.CENTER);
-        configButtons.setPadding(new Insets(50, 0, 0, 0));
-        configButtons.getStyleClass().add("buttonsGrid");
-        configButtons.setVgap(20);
-        configButtons.setHgap(20);
-
-        BorderPane popupRoot = new BorderPane();
-        Stage popupStage = new Stage();
-        Scene popupScene = new Scene(popupRoot, 750, 50);
-        HBox askConfigNameBox = new HBox(50);
-
-        TextField askConfigName = new TextField();
-        askConfigName.setMinWidth(250);
-
-        Label askConfigNameLabel = new Label("Entrez un nom pour votre nouvelle configuration : ");
-        askConfigNameLabel.setMinWidth(300);
-        askConfigNameLabel.setLabelFor(askConfigName);
-        askConfigNameLabel.setId("popupLabel");
-
-        Button submitConfigName = new Button("Confirmer");
-        submitConfigName.setMinWidth(100);
-        Alert error = new Alert(Alert.AlertType.ERROR);
-        error.setTitle("Erreur");
-        error.setHeaderText("");
-        error.setContentText("Une erreur est survenue pendant l'envoi de la configuration");
-        Alert successful = new Alert(Alert.AlertType.INFORMATION);
-        successful.setTitle("Succés");
-        successful.setHeaderText("");
-        successful.setContentText("Votre configuration est sauvegardée");
-        submitConfigName.setOnMouseClicked((event) -> {
-            if(!askConfigName.getText().equals("")){
-                try {
-                    this.simulationConfig.saveConfiguration(askConfigName.getText());
-                    popupStage.close();
-                    successful.show();
-                } catch (SQLException throwables) {
-                    error.show();
-                }
-            }
-        });
-
-        askConfigNameBox.getChildren().addAll(Arrays.asList(askConfigNameLabel, askConfigName, submitConfigName));
-        popupRoot.getChildren().add(askConfigNameBox);
-
-        popupStage.setScene(popupScene);
-        popupStage.setTitle("Nouvelle configuration");
-
-        Button saveConfig = new Button("Sauvegarder configuration");
-        saveConfig.setOnMouseClicked((event) ->{
-            popupStage.show();
-
-        });
-
-        saveConfig.getStyleClass().add("button");
-        Button loadConfig = new Button("Charger configuration");
-        loadConfig.getStyleClass().add("button");
-        Button exportGrid = new Button("Exporter la grille");
-        exportGrid.getStyleClass().add("button");
-        Button importGrid = new Button("Importer la grille");
-        importGrid.getStyleClass().add("button");
-
-        configButtons.add(saveConfig, 0, 0);
-        configButtons.add(loadConfig, 0, 1);
-        configButtons.add(exportGrid, 1, 0);
-        configButtons.add(importGrid, 1, 1);
-
         // Mode buttons
         HBox simMode = new HBox();
         simMode.setAlignment(Pos.CENTER);
@@ -393,10 +349,7 @@ public class Client extends Application implements PropertyChangeListener {
         forestModeButton.getStyleClass().add("active");
         forestModeButton.setOnMouseClicked((event) -> {
             if (this.activeButton != forestModeButton && this.simulation.getStep() == 0) {
-                changeActiveMode(forestModeButton);
-                this.activeButton = forestModeButton;
-                this.simulationConfig.setMode(Mode.forest);
-                this.generateGrid(this.gridPane);
+                changeActiveMode(forestModeButton, Mode.forest);
             }
         });
         simMode.getChildren().add(forestModeButton);
@@ -410,10 +363,7 @@ public class Client extends Application implements PropertyChangeListener {
         fireModeButton.getStyleClass().add("modeButton");
         fireModeButton.setOnMouseClicked((event) -> {
             if (this.activeButton != fireModeButton && this.simulation.getStep() == 0) {
-                changeActiveMode(fireModeButton);
-                this.activeButton = fireModeButton;
-                this.simulationConfig.setMode(Mode.fire);
-                this.generateGrid(this.gridPane);
+                changeActiveMode(fireModeButton, Mode.fire);
             }
         });
 //        fireModeButton.setId("fireMode");
@@ -428,10 +378,7 @@ public class Client extends Application implements PropertyChangeListener {
         Button bugModeButton = new Button("", bugSVG);
         bugModeButton.setOnMouseClicked((event) -> {
             if (this.activeButton != bugModeButton && this.simulation.getStep() == 0) {
-                changeActiveMode(bugModeButton);
-                this.activeButton = bugModeButton;
-                this.simulationConfig.setMode(Mode.insect);
-                this.generateGrid(this.gridPane);
+                changeActiveMode(bugModeButton, Mode.insect);
             }
         });
         bugModeButton.getStyleClass().add("modeButton");
@@ -439,6 +386,144 @@ public class Client extends Application implements PropertyChangeListener {
         simMode.getChildren().add(bugModeButton);
 
         formulary.add(simMode, 0, 5);
+
+        // Boutons configuration
+
+        GridPane configButtons = new GridPane();
+        configButtons.setAlignment(Pos.CENTER);
+        configButtons.setPadding(new Insets(50, 0, 0, 0));
+        configButtons.getStyleClass().add("buttonsGrid");
+        configButtons.setVgap(20);
+        configButtons.setHgap(20);
+
+        HBox askConfigNameBox = new HBox(50);
+        Stage exportConfigStage = new Stage();
+        Scene exportConfigScene = new Scene(askConfigNameBox, 750, 50);
+
+        TextField askConfigName = new TextField();
+        askConfigName.setMinWidth(250);
+
+        Label askConfigNameLabel = new Label("Entrez un nom pour votre nouvelle configuration : ");
+        askConfigNameLabel.setMinWidth(300);
+        askConfigNameLabel.setLabelFor(askConfigName);
+        askConfigNameLabel.setId("popupLabel");
+
+        Button submitConfigName = new Button("Confirmer");
+        submitConfigName.setMinWidth(100);
+
+        submitConfigName.setOnMouseClicked((event) -> {
+            if(!askConfigName.getText().equals("")){
+                try {
+                    this.simulationConfig.saveConfiguration(askConfigName.getText());
+                    exportConfigStage.close();
+                    successful.show();
+                } catch (SQLException throwables) {
+                    error.show();
+                }
+            }
+        });
+
+        askConfigNameBox.getChildren().addAll(Arrays.asList(askConfigNameLabel, askConfigName, submitConfigName));
+
+        exportConfigStage.setScene(exportConfigScene);
+        exportConfigStage.setTitle("Nouvelle configuration");
+
+        Button saveConfig = new Button("Sauvegarder configuration");
+        saveConfig.setOnMouseClicked((event) ->{
+            exportConfigStage.show();
+        });
+
+        Stage importConfig = new Stage();
+        ScrollPane importerScroll = new ScrollPane();
+        VBox importConfigsRoot = new VBox(50);
+        GridPane configs = new GridPane();
+        importerScroll.setContent(configs);
+        configs.setHgap(30);
+        configs.setVgap(50);
+        importConfigsRoot.getChildren().add(importerScroll);
+        Scene importConfigScene = new Scene(importConfigsRoot, 800, 300);
+
+        importConfig.setScene(importConfigScene);
+
+
+        saveConfig.getStyleClass().add("button");
+        Button loadConfig = new Button("Charger configuration");
+        loadConfig.setOnMouseClicked((event) -> {
+            refreshConfigs();
+            configs.getChildren().clear();
+            int configNumber = 1;
+            try{
+                ResultSet allConfigs = Configuration.selectAllConfigurations();
+                ResultSetMetaData configMD = allConfigs.getMetaData();
+                for(int i = 1; i < configMD.getColumnCount() + 1; i++){
+                    configs.add(new Text(configMD.getColumnLabel(i)), i - 1, 0);
+                }
+                while(allConfigs.next()){
+                    int line_id = allConfigs.getInt(1);
+                    for(int i = 1; i < configMD.getColumnCount() + 1; i++){
+                        Text property = new Text(allConfigs.getString(configMD.getColumnName(i)));
+                        property.setTextAlignment(TextAlignment.CENTER);
+                        configs.add(property, i - 1, configNumber);
+                    }
+                    Button importButton = new Button("Importer");
+                    importButton.setOnMouseClicked((importButtonClick -> {
+                        try {
+                            ResultSet importedConfig = Configuration.selectOneConfiguration(line_id);
+                            while(importedConfig.next()){
+                                simulationSpeedField.setText(importedConfig.getString(2));
+                                simulationStepField.setText(importedConfig.getString(3));
+                                gridWidthField.setText(importedConfig.getString(4));
+                                gridHeightField.setText(importedConfig.getString(5));
+                                switch(Mode.valueOf(importedConfig.getString(6))){
+                                    case fire -> {
+                                        changeActiveMode(fireModeButton, Mode.fire);
+                                    }
+                                    case forest -> {
+                                        changeActiveMode(forestModeButton, Mode.forest);
+                                    }
+                                    case insect -> {
+                                        changeActiveMode(bugModeButton, Mode.insect);
+                                    }
+                                }
+                                this.simulationConfig = new Configuration(
+                                    importedConfig.getDouble(2),
+                                    importedConfig.getInt(3),
+                                    Mode.valueOf(importedConfig.getString(6)),
+                                    importedConfig.getInt(4),
+                                    importedConfig.getInt(5)
+                                );
+                                this.simulation = new Simulation(this.simulationConfig);
+                                generateGrid(this.gridPane);
+                                importConfig.close();
+                            }
+
+                        } catch (SQLException throwables) {
+                            System.out.println(throwables.getMessage());
+                            error.show();
+                        }
+
+                    }));
+                    importButton.setMinWidth(100);
+                    configs.add(importButton, 8, configNumber);
+                    configNumber++;
+                }
+            }catch (SQLException e){
+                refreshConfigs();
+                error.show();
+            }
+            importConfig.show();
+        });
+        loadConfig.getStyleClass().add("button");
+        Button exportGrid = new Button("Exporter la grille");
+        exportGrid.getStyleClass().add("button");
+        Button importGrid = new Button("Importer la grille");
+        importGrid.getStyleClass().add("button");
+
+        configButtons.add(saveConfig, 0, 0);
+        configButtons.add(loadConfig, 0, 1);
+        configButtons.add(exportGrid, 1, 0);
+        configButtons.add(importGrid, 1, 1);
+
 
         //Simulation control
         HBox controlButtons = new HBox();

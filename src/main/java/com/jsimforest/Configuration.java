@@ -143,14 +143,14 @@ public class Configuration implements DataBaseInterface {
         DataBaseInterface.insert(sql);
     }
 
-    public ResultSet selectOneConfiguration(int id) throws  SQLException {
+    public static ResultSet selectOneConfiguration(int id) throws  SQLException {
 
         String sql = MessageFormat.format("SELECT * FROM configurations WHERE id = {0}", id);
 
         return DataBaseInterface.select(sql);
     }
 
-    public ResultSet selectAllConfigurations() throws  SQLException {
+    public static ResultSet selectAllConfigurations() throws  SQLException {
 
         String sql = "SELECT * FROM configurations ";
 
