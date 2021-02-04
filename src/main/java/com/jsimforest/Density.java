@@ -7,17 +7,19 @@ public class Density {
     private final double plantDensity;
     private final double youngTreeDensity;
     private final double treeDensity;
-    private double burningDensity;
-    private double ashDensity;
-    private double insectDensity;
+    private final double burningDensity;
+    private final double ashDensity;
+    private final double insectDensity;
+    private int step;
 
-    public Density(double plantDensity, double youngTreeDensity, double treeDensity) {
+    public Density(double plantDensity, double youngTreeDensity, double treeDensity, int step) {
         this.plantDensity = plantDensity;
         this.youngTreeDensity = youngTreeDensity;
         this.treeDensity = treeDensity;
         this.burningDensity = 0;
         this.ashDensity = 0;
         this.insectDensity = 0;
+        this.step = step;
     }
 
     public Density(
@@ -26,7 +28,8 @@ public class Density {
             double treeDensity,
             double burningDensity,
             double ashDensity,
-            double insectDensity
+            double insectDensity,
+            int step
     ) {
         this.plantDensity = plantDensity;
         this.youngTreeDensity = youngTreeDensity;
@@ -34,6 +37,7 @@ public class Density {
         this.burningDensity = burningDensity;
         this.ashDensity = ashDensity;
         this.insectDensity = insectDensity;
+        this.step = step;
     }
 
     public double getPlantDensity() {
@@ -64,6 +68,10 @@ public class Density {
     public double getInsectDensity() {
 
         return insectDensity;
+    }
+
+    public int getStep() {
+        return step;
     }
 
     @Override
