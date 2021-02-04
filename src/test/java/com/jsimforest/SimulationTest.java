@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,6 +90,61 @@ class SimulationTest extends AbstractTest {
         assertEquals(stepsNumber, simulation.getStep());
         assertFalse(copyGrid.equals(simulation.getGrid()));
         assertEquals(expectedElapsedTime, simulation.getElapsedTime());
+    }
+
+    @Test
+    public void instantDensity_forest() {
+        double expectedPlantDensity = (double) 1 / (double) 9;
+        double expectedYoungTreeDensity = (double) 2 / (double) 9;
+        double expectedTreeDensity = (double) 1 / (double) 9;
+
+        Density expectedDensity = new Density(expectedPlantDensity, expectedYoungTreeDensity, expectedTreeDensity);
+
+        Configuration config = new Configuration(1, 1, Mode.forest, 3, 3);
+        Simulation simulation = new Simulation(config);
+        ArrayList<ArrayList<Cell>> matrix = createLittleMatrix_fromNull_oneTreeTwoYoungTrees();
+
+        simulation.getGrid().setMatrix(matrix);
+
+        simulation.step();
+
+        assertEquals(expectedDensity, simulation.getDensities().get(0));
+    }
+
+    @Test
+    public void densities_forest() {
+        double s1expectedPlantDensity = (double) 1 / (double) 9;
+        double s1expectedYoungTreeDensity = (double) 2 / (double) 9;
+        double s1expectedTreeDensity = (double) 1 / (double) 9;
+        Density s1Density = new Density(s1expectedPlantDensity, s1expectedYoungTreeDensity, s1expectedTreeDensity);
+
+        double s2expectedPlantDensity = (double) 0 / (double) 9;
+        double s2expectedYoungTreeDensity = (double) 1 / (double) 9;
+        double s2expectedTreeDensity = (double) 3 / (double) 9;
+        Density s2Density = new Density(s2expectedPlantDensity, s2expectedYoungTreeDensity, s2expectedTreeDensity);
+
+        double s3expectedPlantDensity = (double) 2 / (double) 9;
+        double s3expectedYoungTreeDensity = (double) 1 / (double) 9;
+        double s3expectedTreeDensity = (double) 3 / (double) 9;
+        Density s3Density = new Density(s3expectedPlantDensity, s3expectedYoungTreeDensity, s3expectedTreeDensity);
+
+        ArrayList<Density> expectedDensities = new ArrayList<>();
+        expectedDensities.add(s1Density);
+        expectedDensities.add(s2Density);
+        expectedDensities.add(s3Density);
+
+        Configuration config = new Configuration(1, 3, Mode.forest, 3, 3);
+        Simulation simulation = new Simulation(config);
+        ArrayList<ArrayList<Cell>> matrix = createLittleMatrix_fromNull_oneTreeTwoYoungTrees();
+
+        simulation.getGrid().setMatrix(matrix);
+
+        simulation.run();
+        ArrayList<Density> densities = simulation.getDensities();
+
+        for (int i = 0; i < densities.size(); i++){
+            assertEquals(expectedDensities.get(i), densities.get(i));
+        }
     }
 
     @ParameterizedTest
